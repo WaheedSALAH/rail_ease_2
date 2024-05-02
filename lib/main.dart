@@ -1,3 +1,5 @@
+// main.dart
+import 'package:flutter/material.dart';
 import 'package:flutter/material.dart';
 
 import 'package:rail_ease/pages/add_card.dart';
