@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:rail_ease/pages/add_card.dart';
 import 'package:rail_ease/pages/basic_page_1.dart';
+import 'package:rail_ease/pages/creation_an_account.dart';
 import 'package:rail_ease/pages/login.dart';
 import 'package:rail_ease/pages/verify_empty.dart';
 
@@ -25,7 +26,7 @@ class MyApp extends StatelessWidget {
         // body: Calendar(),
         // body: ChangePassword(),
         // body: Correct(),
-        // body: CreationAnAccount(),
+        body: CreationAnAccount(),
         // body: DeleteAccount(),
         // body: DownloadTicket(),
         // body: EditProfile(),
@@ -36,7 +37,7 @@ class MyApp extends StatelessWidget {
         // body: Language(),
         // body: Location(),
         // body: LogOut(),
-        body: Login(),
+        // body: Login(),
         // body: MyTicket(),
         // body: NotCorrect(),
         // body: Notifications(),
