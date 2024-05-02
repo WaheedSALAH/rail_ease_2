@@ -49,7 +49,7 @@ class FastTicket extends StatelessWidget {
                     width: 277,
                     height: 294,
                     child: SvgPicture.asset(
-                      'assets/images/ellipse_12.jpeg.jpeg',
+                      'assets/images/ellipse_12.jpeg',
                     ),
                   ),
                 ),
@@ -132,22 +132,28 @@ class FastTicket extends StatelessWidget {
                         ),
                       ),
                     ),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Color(0xFFFF0000),
-                        borderRadius: BorderRadius.circular(14),
-                      ),
+                    GestureDetector(
+                      onTap: () {
+                        // Add action for NEXT button
+                      },
                       child: Container(
-                        width: 138,
-                        padding: EdgeInsets.fromLTRB(0, 11, 2.1, 16),
-                        child: Text(
-                          'NEXT',
-                          style: GoogleFonts.getFont(
-                            'Inika',
-                            fontWeight: FontWeight.w400,
-                            fontSize: 18,
-                            letterSpacing: -0.4,
-                            color: Color(0xFFFFFFFF),
+                        decoration: BoxDecoration(
+                          color: Color(0xFFFF0000),
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        child: Container(
+                          width: 138,
+                          padding: EdgeInsets.fromLTRB(0, 11, 2.1, 16),
+                          alignment: Alignment.center,
+                          child: Text(
+                            'NEXT',
+                            style: GoogleFonts.getFont(
+                              'Inika',
+                              fontWeight: FontWeight.w400,
+                              fontSize: 18,
+                              letterSpacing: -0.4,
+                              color: Color(0xFFFFFFFF),
+                            ),
                           ),
                         ),
                       ),
