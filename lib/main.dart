@@ -4,10 +4,12 @@ import 'package:flutter/material.dart';
 
 import 'package:rail_ease/pages/add_card.dart';
 import 'package:rail_ease/pages/basic_page_1.dart';
+import 'package:rail_ease/pages/book_your_ticket.dart';
 import 'package:rail_ease/pages/creation_an_account.dart';
 import 'package:rail_ease/pages/fast_ticket.dart';
 import 'package:rail_ease/pages/login.dart';
 import 'package:rail_ease/pages/program_features.dart';
+import 'package:rail_ease/pages/time_to_arrive.dart';
 import 'package:rail_ease/pages/verify_empty.dart';
 
 import 'pages/basic_page.dart';
@@ -36,7 +38,7 @@ class MyApp extends StatelessWidget {
         // body: EditProfile(),
         // body: EnableLocation(),
         // body: FastTicket(),
-        body: Forget(),
+        // body: Forget(),
         // body: HomePage(),
         // body: Language(),
         // body: Location(),
@@ -59,7 +61,7 @@ class MyApp extends StatelessWidget {
         // body: Splash(),
         // body: TimeToArrive(),
         // body: VerifyActive(),
-        // body: VerifyEmpty(),
+        body: VerifyEmpty(),
       ),
     );
   }
