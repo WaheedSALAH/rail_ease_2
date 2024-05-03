@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class TimeToArrive extends StatelessWidget {
+class Fast extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -46,13 +46,13 @@ class TimeToArrive extends StatelessWidget {
                     width: 277,
                     height: 294,
                     child: Image.asset(
-                      'assets/images/ellipse_1.jpeg',
+                      'assets/images/ellipse_12.jpeg',
                       fit: BoxFit.cover,
                     ),
                   ),
                   SizedBox(height: 20),
                   Text(
-                    'time to arrive',
+                    'fast ticket read qr-code',
                     textAlign: TextAlign.center,
                     style: GoogleFonts.inika(
                       fontWeight: FontWeight.w700,
@@ -70,8 +70,8 @@ class TimeToArrive extends StatelessWidget {
                         margin: EdgeInsets.only(top: 25, bottom: 15),
                         child: Row(
                           children: [
-                            _buildIndicatorDot(Color(0x26FF0000)),
                             _buildIndicatorDot(Color(0xFFFF0000)),
+                            _buildIndicatorDot(Color(0x26FF0000)),
                             _buildIndicatorDot(Color(0x26FF0000)),
                           ],
                         ),

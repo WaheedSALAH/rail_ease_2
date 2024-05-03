@@ -6,9 +6,8 @@ import 'package:rail_ease/pages/add_card.dart';
 import 'package:rail_ease/pages/basic_page_1.dart';
 import 'package:rail_ease/pages/book_your_ticket.dart';
 import 'package:rail_ease/pages/creation_an_account.dart';
-import 'package:rail_ease/pages/fast_ticket.dart';
 import 'package:rail_ease/pages/login.dart';
-import 'package:rail_ease/pages/program_features.dart';
+import 'package:rail_ease/pages/fast_screen.dart';
 import 'package:rail_ease/pages/time_to_arrive.dart';
 import 'package:rail_ease/pages/verify_empty.dart';
 
@@ -28,7 +27,7 @@ class MyApp extends StatelessWidget {
         // body: AddCard(),
         // body: BasicPage(),
         // body: BasicPage1(),
-        // body: BookYourTicket(),
+        body: BookYourTicket(),
         // body: Calendar(),
         // body: ChangePassword(),
         // body: Correct(),
@@ -49,7 +48,7 @@ class MyApp extends StatelessWidget {
         // body: Notifications(),
         // body: PaymentMethodNoMastercard(),
         // body: PrivacyPolicy(),
-        // body: ProgramFeatures(),
+        // body: Fast(),
         // body: ResetEmpty(),
         // body: ScanQr(),
         // body: SelectSeat1(),
@@ -61,7 +60,7 @@ class MyApp extends StatelessWidget {
         // body: Splash(),
         // body: TimeToArrive(),
         // body: VerifyActive(),
-        body: VerifyEmpty(),
+        // body: VerifyEmpty(),
       ),
     );
   }
