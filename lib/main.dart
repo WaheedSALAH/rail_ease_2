@@ -4,12 +4,11 @@ import 'package:flutter/material.dart';
 
 import 'package:rail_ease/pages/add_card.dart';
 import 'package:rail_ease/pages/basic_page_1.dart';
-import 'package:rail_ease/pages/book_your_ticket.dart';
 import 'package:rail_ease/pages/creation_an_account.dart';
 import 'package:rail_ease/pages/login.dart';
-import 'package:rail_ease/pages/fast_screen.dart';
-import 'package:rail_ease/pages/time_to_arrive.dart';
-import 'package:rail_ease/pages/verify_empty.dart';
+import 'package:rail_ease/pages/onboarding_screen.dart';
+import 'package:rail_ease/pages/verify_new_account.dart';
+import 'package:rail_ease/pages/verify_forget_pass.dart';
 
 import 'pages/basic_page.dart';
 import 'pages/forget.dart';
@@ -27,7 +26,7 @@ class MyApp extends StatelessWidget {
         // body: AddCard(),
         // body: BasicPage(),
         // body: BasicPage1(),
-        body: BookYourTicket(),
+        // body: BookYourTicket(),
         // body: Calendar(),
         // body: ChangePassword(),
         // body: Correct(),
@@ -59,8 +58,9 @@ class MyApp extends StatelessWidget {
         // body: Settings(),
         // body: Splash(),
         // body: TimeToArrive(),
-        // body: VerifyActive(),
+        // body: Verify_Email(),
         // body: VerifyEmpty(),
+        body: OnboardingScreen(),
       ),
     );
   }

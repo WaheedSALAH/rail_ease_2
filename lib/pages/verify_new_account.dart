@@ -1,8 +1,48 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:google_fonts/google_fonts.dart';
 
-class VerifyEmpty extends StatelessWidget {
+class Verify_Email extends StatefulWidget {
+  @override
+  _VerifyEmptyState createState() => _VerifyEmptyState();
+}
+
+class _VerifyEmptyState extends State<Verify_Email> {
+  List<TextEditingController> _controllers = List.generate(
+    6,
+    (index) => TextEditingController(),
+  );
+  List<FocusNode> _focusNodes = List.generate(6, (index) => FocusNode());
+
+  Color _buttonColor = Colors.grey; // Initial color of the button
+
+  @override
+  void initState() {
+    super.initState();
+    _configureFocusNodes();
+  }
+
+  void _configureFocusNodes() {
+    for (int i = 0; i < _focusNodes.length; i++) {
+      _focusNodes[i].addListener(() {
+        if (_focusNodes[i].hasFocus) {
+          _controllers[i].selection = TextSelection.fromPosition(
+            TextPosition(offset: _controllers[i].text.length),
+          );
+        }
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    for (var controller in _controllers) {
+      controller.dispose();
+    }
+    for (var focusNode in _focusNodes) {
+      focusNode.dispose();
+    }
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -26,10 +66,13 @@ class VerifyEmpty extends StatelessWidget {
                     child: Align(
                       alignment: Alignment.topLeft,
                       child: SizedBox(
-                        width: 40,
-                        height: 40,
-                        child: SvgPicture.asset(
-                          'assets/vectors/back_2_x2.svg',
+                        width: 45,
+                        height: 45,
+                        child: IconButton(
+                          icon: Icon(Icons.arrow_back),
+                          onPressed: () {
+                            // Implement action to go back
+                          },
                         ),
                       ),
                     ),
@@ -44,24 +87,20 @@ class VerifyEmpty extends StatelessWidget {
                       Container(
                         margin: EdgeInsets.fromLTRB(13.7, 0, 13.7, 12),
                         child: Text(
-                          'Forgot Password',
-                          style: GoogleFonts.getFont(
-                            'Inika',
+                          'Create an account',
+                          style: TextStyle(
                             fontWeight: FontWeight.w700,
                             fontSize: 24,
-                            height: 1.3,
                             color: Color(0xFFFF0000),
                           ),
                         ),
                       ),
                       Text(
-                        'Code has been send to n***---Mail.Com',
+                        'Code has been sent ✔️ ',
                         textAlign: TextAlign.center,
-                        style: GoogleFonts.getFont(
-                          'Inika',
+                        style: TextStyle(
                           fontWeight: FontWeight.w400,
                           fontSize: 16,
-                          height: 1.5,
                           color: Color(0xFFA0A0A0),
                         ),
                       ),
@@ -93,22 +132,42 @@ class VerifyEmpty extends StatelessWidget {
                                     ),
                                   ],
                                 ),
-                                child: GestureDetector(
-                                  onTap: () {
-                                    FocusScope.of(context).requestFocus(
-                                        FocusNode()); // Dismisses keyboard if it's currently open
-                                    FocusScope.of(context).requestFocus(
-                                        FocusNode()); // Requests focus to dismiss keyboard
-                                  },
-                                  child: TextField(
-                                    textAlign: TextAlign.center,
-                                    keyboardType: TextInputType.number,
-                                    maxLength: 1,
-                                    decoration: InputDecoration(
-                                      counterText: '',
-                                      border: InputBorder.none,
-                                    ),
+                                child: TextField(
+                                  controller: _controllers[i],
+                                  focusNode: _focusNodes[i],
+                                  textAlign: TextAlign.center,
+                                  keyboardType: TextInputType.number,
+                                  maxLength: 1,
+                                  decoration: InputDecoration(
+                                    counterText: '',
+                                    border: InputBorder.none,
                                   ),
+                                  onChanged: (value) {
+                                    // Check if all text fields have digits
+                                    bool allFilled = true;
+                                    for (var controller in _controllers) {
+                                      if (controller.text.isEmpty ||
+                                          !RegExp(r'^[0-9]+$')
+                                              .hasMatch(controller.text)) {
+                                        allFilled = false;
+                                        break;
+                                      }
+                                    }
+                                    setState(() {
+                                      _buttonColor =
+                                          allFilled ? Colors.red : Colors.grey;
+                                    });
+                                    // Move focus to the next or previous text field based on input
+                                    if (value.isEmpty) {
+                                      if (i > 0) {
+                                        _focusNodes[i - 1].requestFocus();
+                                      }
+                                    } else {
+                                      if (i < _focusNodes.length - 1) {
+                                        _focusNodes[i + 1].requestFocus();
+                                      }
+                                    }
+                                  },
                                 ),
                               ),
                             ),
@@ -117,50 +176,15 @@ class VerifyEmpty extends StatelessWidget {
                     ),
                   ),
                 ),
-                Container(
-                  margin: EdgeInsets.fromLTRB(21, 0, 0, 37),
-                  child: RichText(
-                    text: TextSpan(
-                      style: GoogleFonts.getFont(
-                        'Poppins',
-                        fontWeight: FontWeight.w500,
-                        fontSize: 16,
-                        height: 1.4,
-                        color: Color(0xFF5A5A5A),
-                      ),
-                      children: [
-                        TextSpan(
-                          text: 'Didn’t receive code? ',
-                          style: GoogleFonts.getFont(
-                            'Inika',
-                            fontWeight: FontWeight.w400,
-                            fontSize: 16,
-                            height: 1.3,
-                          ),
-                        ),
-                        TextSpan(
-                          text: 'Resend again',
-                          style: GoogleFonts.getFont(
-                            'Inika',
-                            fontWeight: FontWeight.w400,
-                            fontSize: 16,
-                            height: 1.3,
-                            color: Color(0xFFFF0000),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
                 GestureDetector(
                   onTap: () {
-                    // Implement code to focus on text input for verification code
+                    // Perform verification action here
                   },
                   child: Container(
                     margin: EdgeInsets.fromLTRB(25, 0, 0, 0),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(14),
-                      color: Color(0xFFFF0000),
+                      color: _buttonColor,
                       boxShadow: [
                         BoxShadow(
                           color: Color(0x40000000),
@@ -174,8 +198,7 @@ class VerifyEmpty extends StatelessWidget {
                       padding: EdgeInsets.fromLTRB(50, 10, 10.3, 17),
                       child: Text(
                         'Verify',
-                        style: GoogleFonts.getFont(
-                          'Inika',
+                        style: TextStyle(
                           fontWeight: FontWeight.w400,
                           fontSize: 18,
                           letterSpacing: -0.4,
