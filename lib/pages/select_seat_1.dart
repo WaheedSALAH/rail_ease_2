@@ -3,7 +3,7 @@ import 'dart:ui';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class SelectSeat1 extends StatelessWidget {
+class SelectSeat extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(

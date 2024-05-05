@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:rail_ease/pages/menu%20%E2%9C%94%EF%B8%8F.dart';
 
 void main() {
   runApp(MyApp());
@@ -20,6 +21,20 @@ class BasicPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('Rail Ease'),
+        automaticallyImplyLeading: false, // This line removes the back button
+        actions: [
+          IconButton(
+            icon: Icon(Icons.menu),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => Menu(),
+                ),
+              );
+            },
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -114,6 +129,10 @@ class SearchForm extends StatefulWidget {
 
 class _SearchFormState extends State<SearchForm> {
   DateTime? _selectedDate;
+  String? _currentStation;
+  String? _arrivalStation;
+
+  final List<String> stations = ['Zagazig', 'Cairo', 'Faqous'];
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -144,8 +163,8 @@ class _SearchFormState extends State<SearchForm> {
                 readOnly: true,
                 decoration: InputDecoration(
                   labelText: _selectedDate != null
-                      ? 'Depature Date: ${_selectedDate!.day}/${_selectedDate!.month}/${_selectedDate!.year}'
-                      : 'Depature Date',
+                      ? 'Departure Date: ${_selectedDate!.day}/${_selectedDate!.month}/${_selectedDate!.year}'
+                      : 'Departure Date',
                   hintText: 'Select Date',
                   border: OutlineInputBorder(),
                   suffixIcon: Icon(Icons.calendar_today),
@@ -155,14 +174,24 @@ class _SearchFormState extends State<SearchForm> {
           ),
           SizedBox(height: 20), // Add space between fields
 
-          TextFormField(
+          DropdownButtonFormField<String>(
             decoration: InputDecoration(
-              suffixText: "from",
-              labelText: 'Choose Departure from',
-              hintText: 'Select Departure',
+              labelText: 'Choose Current Station',
               border: OutlineInputBorder(),
               suffixIcon: Icon(Icons.keyboard_arrow_down),
             ),
+            value: _currentStation,
+            items: stations.map((station) {
+              return DropdownMenuItem<String>(
+                value: station,
+                child: Text(station),
+              );
+            }).toList(),
+            onChanged: (value) {
+              setState(() {
+                _currentStation = value;
+              });
+            },
           ),
           SizedBox(height: 5), // Add space between fields
 
@@ -182,13 +211,24 @@ class _SearchFormState extends State<SearchForm> {
             ],
           ),
           SizedBox(height: 10), // Add space between fields
-          TextFormField(
+          DropdownButtonFormField<String>(
             decoration: InputDecoration(
-              labelText: 'Choose Arrival at',
-              hintText: 'Select Arrival',
+              labelText: 'Choose Arrival Station',
               border: OutlineInputBorder(),
               suffixIcon: Icon(Icons.keyboard_arrow_down),
             ),
+            value: _arrivalStation,
+            items: stations.map((station) {
+              return DropdownMenuItem<String>(
+                value: station,
+                child: Text(station),
+              );
+            }).toList(),
+            onChanged: (value) {
+              setState(() {
+                _arrivalStation = value;
+              });
+            },
           ),
         ],
       ),

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
-class VerifyEmpty extends StatefulWidget {
+class Verify_password extends StatefulWidget {
   @override
   _VerifyEmptyState createState() => _VerifyEmptyState();
 }
 
-class _VerifyEmptyState extends State<VerifyEmpty> {
+class _VerifyEmptyState extends State<Verify_password> {
   List<TextEditingController> _controllers = List.generate(
     6,
     (index) => TextEditingController(),
