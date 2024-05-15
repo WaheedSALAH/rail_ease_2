@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:rail_ease/pages/edit_profile.dart';
-import 'package:rail_ease/pages/location.dart';
+import 'package:rail_ease/pages/edit_profile%20%E2%9C%94%EF%B8%8F.dart';
+import 'package:rail_ease/pages/Train_location.dart';
 import 'package:rail_ease/pages/scan_qr.dart';
 import 'package:rail_ease/pages/settings%20%E2%9C%94%EF%B8%8F.dart';
 
@@ -65,12 +65,12 @@ class Menu extends StatelessWidget {
         title: 'Train Location',
         iconData: Icons.train,
         onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => Location(),
-            ),
-          );
+          // Navigator.push(
+          //   context,
+          //   MaterialPageRoute(
+          //     builder: (context) => Location(),
+          //   ),
+          // );
         },
       ),
       MenuItem(

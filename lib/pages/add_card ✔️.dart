@@ -2,31 +2,41 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:rail_ease/pages/select_seat_1.dart';
+import 'package:rail_ease/pages/select_seat ✔️.dart';
 
 class AddCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Container(
-        decoration: BoxDecoration(
-          color: Color(0xFFFFFFFF),
-          borderRadius: BorderRadius.circular(20),
-        ),
-        padding: EdgeInsets.fromLTRB(23, 42, 24, 259),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildTitle(context),
-            SizedBox(height: 46),
-            _buildInputField('CARD HOLDER NAME', 'name holder',
-                maxLength: null, format: null),
-            _buildInputField('CARD NUMBER', 'Enter card number',
-                maxLength: 19, format: _CardNumberFormatter()),
-            _buildExpiryAndCVC(),
-            SizedBox(height: 48),
-            _buildButtons(),
-          ],
+    return Material(
+      child: WillPopScope(
+        onWillPop: () async {
+          // Navigate back when the back button is pressed
+          Navigator.of(context).pop();
+          // Return true to indicate that the back button press is handled
+          return true;
+        },
+        child: SingleChildScrollView(
+          child: Container(
+            decoration: BoxDecoration(
+              color: Color(0xFFFFFFFF),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            padding: EdgeInsets.fromLTRB(23, 42, 24, 259),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildTitle(context),
+                SizedBox(height: 46),
+                _buildInputField('CARD HOLDER NAME', 'name holder',
+                    maxLength: null, format: null),
+                _buildInputField('CARD NUMBER', 'Enter card number',
+                    maxLength: 19, format: _CardNumberFormatter()),
+                _buildExpiryAndCVC(),
+                SizedBox(height: 48),
+                _buildButtons(),
+              ],
+            ),
+          ),
         ),
       ),
     );
@@ -38,10 +48,10 @@ class AddCard extends StatelessWidget {
       children: [
         GestureDetector(
           onTap: () {
-            Navigator.pushReplacement(
-                context, MaterialPageRoute(builder: (context) => SelectSeat()));
+            Navigator.pop(context); // Navigate back to SelectSeat
           },
-          child: SvgPicture.asset('assets/vectors/back_11_x2.svg'),
+          child: SvgPicture.asset(
+              'assets/vectors/back_11_x2.svg'), // Adjust the path if needed
         ),
         Text(
           'Add Card',
@@ -114,7 +124,7 @@ class AddCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildInputField('CVC', '***',
+              _buildInputField('CVC', '',
                   maxLength: 3, format: FilteringTextInputFormatter.digitsOnly),
             ],
           ),

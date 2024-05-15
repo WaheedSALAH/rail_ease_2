@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:rail_ease/pages/Train_location.dart';
 import 'package:rail_ease/pages/menu%20%E2%9C%94%EF%B8%8F.dart';
+
+import 'my_ticket.dart';
+import 'notifications.dart';
+import 'select_your_train ✔️.dart';
 
 void main() {
   runApp(MyApp());
@@ -41,10 +46,57 @@ class BasicPage extends StatelessWidget {
           children: [
             Header(),
             SearchForm(),
-            TrainInfo(),
             Footer(),
             SizedBox(
               height: 100,
+            ),
+          ],
+        ),
+      ),
+      bottomNavigationBar: BottomAppBar(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            IconButton(
+              icon: Icon(Icons.home),
+              onPressed: () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => BasicPage()),
+                );
+              },
+            ),
+            IconButton(
+              icon: ImageIcon(
+                AssetImage(
+                    'assets/images/ticket.png'), // Replace 'ticket_icon.png' with your image asset path
+                size: 32, // Adjust the size as needed
+                // color: Colors.red, // Customize the color as needed
+              ),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => MyTicket()),
+                );
+              },
+            ),
+            IconButton(
+              icon: Icon(Icons.notifications),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => Notifications()),
+                );
+              },
+            ),
+            IconButton(
+              icon: Icon(Icons.train),
+              onPressed: () {
+                // Navigator.push(
+                //   context,
+                //   // MaterialPageRoute(builder: (context) => Location()),
+                // );
+              },
             ),
           ],
         ),
@@ -236,67 +288,6 @@ class _SearchFormState extends State<SearchForm> {
   }
 }
 
-class TrainInfo extends StatefulWidget {
-  @override
-  _TrainInfoState createState() => _TrainInfoState();
-}
-
-class _TrainInfoState extends State<TrainInfo> {
-  int adultsCount = 1;
-  int childrenCount = 0;
-
-  void incrementAdults() {
-    setState(() {
-      adultsCount++;
-    });
-  }
-
-  void decrementAdults() {
-    if (adultsCount > 0) {
-      setState(() {
-        adultsCount--;
-      });
-    }
-  }
-
-  void incrementChildren() {
-    setState(() {
-      childrenCount++;
-    });
-  }
-
-  void decrementChildren() {
-    if (childrenCount > 0) {
-      setState(() {
-        childrenCount--;
-      });
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 328.63,
-      child: Column(
-        children: [
-          TrainInfoItem(
-            title: 'Adult (12+) Y',
-            value: adultsCount.toString(),
-            onIncrement: incrementAdults,
-            onDecrement: decrementAdults,
-          ),
-          TrainInfoItem(
-            title: 'Children (2-12) Y',
-            value: childrenCount.toString(),
-            onIncrement: incrementChildren,
-            onDecrement: decrementChildren,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 class TrainInfoItem extends StatelessWidget {
   final String title;
   final String value;
@@ -354,33 +345,42 @@ class TrainInfoItem extends StatelessWidget {
 class Footer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: () {
-          // Action to perform when "Search train" is tapped
-          print('Search train tapped!');
-        },
-        child: Container(
-          width: 284,
-          height: 50,
-          decoration: BoxDecoration(
-            color: Color(0xFFFF0000),
-            borderRadius: BorderRadius.circular(14),
-          ),
-          child: Center(
-            child: Text(
-              'Search train',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 18,
-                fontFamily: 'Inika',
-                fontWeight: FontWeight.w400,
+    return Column(
+      children: [
+        SizedBox(height: 40), // Add a SizedBox above the button
+        Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => SelectYourTrain(),
+                ),
+              );
+            },
+            child: Container(
+              width: 284,
+              height: 50,
+              decoration: BoxDecoration(
+                color: Color(0xFFFF0000),
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Center(
+                child: Text(
+                  'Search train',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontFamily: 'Inika',
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
               ),
             ),
           ),
         ),
-      ),
+      ],
     );
   }
 }
