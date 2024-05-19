@@ -1,11 +1,12 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
-class Verify_password extends StatefulWidget {
+class VerifyPassword extends StatefulWidget {
   @override
-  _VerifyEmptyState createState() => _VerifyEmptyState();
+  _VerifyPasswordState createState() => _VerifyPasswordState();
 }
 
-class _VerifyEmptyState extends State<Verify_password> {
+class _VerifyPasswordState extends State<VerifyPassword> {
   List<TextEditingController> _controllers = List.generate(
     6,
     (index) => TextEditingController(),
@@ -43,6 +44,11 @@ class _VerifyEmptyState extends State<Verify_password> {
     super.dispose();
   }
 
+  void _resendCode() {
+    // Implement the action to resend the code
+    print('Resend code tapped');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -52,14 +58,14 @@ class _VerifyEmptyState extends State<Verify_password> {
         ),
         child: SingleChildScrollView(
           child: Container(
-            padding: EdgeInsets.fromLTRB(23, 42, 27, 406),
+            padding: EdgeInsets.fromLTRB(23, 42, 27, 30),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 GestureDetector(
                   onTap: () {
-                    // Implement the action to go back
+                    Navigator.pop(context);
                   },
                   child: Container(
                     margin: EdgeInsets.fromLTRB(0, 0, 0, 13),
@@ -71,7 +77,7 @@ class _VerifyEmptyState extends State<Verify_password> {
                         child: IconButton(
                           icon: Icon(Icons.arrow_back),
                           onPressed: () {
-                            // Implement action to go back
+                            Navigator.pop(context);
                           },
                         ),
                       ),
@@ -96,7 +102,7 @@ class _VerifyEmptyState extends State<Verify_password> {
                         ),
                       ),
                       Text(
-                        'Code has been sent ✔️ ',
+                        'Code has been sent to your email ✔️ ',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontWeight: FontWeight.w400,
@@ -112,10 +118,10 @@ class _VerifyEmptyState extends State<Verify_password> {
                   child: Align(
                     alignment: Alignment.topRight,
                     child: SizedBox(
-                      width: 305,
+                      width: 340,
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           for (int i = 0; i < 6; i++)
                             Flexible(
@@ -181,7 +187,7 @@ class _VerifyEmptyState extends State<Verify_password> {
                     // Perform verification action here
                   },
                   child: Container(
-                    margin: EdgeInsets.fromLTRB(25, 0, 0, 0),
+                    margin: EdgeInsets.fromLTRB(25, 0, 0, 20),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(14),
                       color: _buttonColor,
@@ -208,6 +214,31 @@ class _VerifyEmptyState extends State<Verify_password> {
                     ),
                   ),
                 ),
+                RichText(
+                  text: TextSpan(
+                    text: 'Didn\'t receive the code? ',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w400,
+                      fontSize: 16,
+                      color: Color(0xFFA0A0A0),
+                    ),
+                    children: <TextSpan>[
+                      TextSpan(
+                        text: 'Resend code',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w400,
+                          fontSize: 16,
+                          color: Colors.blue,
+                          decoration: TextDecoration.underline,
+                        ),
+                        recognizer: TapGestureRecognizer()
+                          ..onTap = () {
+                            // Add action to navigate to login screen
+                          },
+                      ),
+                    ],
+                  ),
+                ),
               ],
             ),
           ),
@@ -215,4 +246,10 @@ class _VerifyEmptyState extends State<Verify_password> {
       ),
     );
   }
+}
+
+void main() {
+  runApp(MaterialApp(
+    home: VerifyPassword(),
+  ));
 }

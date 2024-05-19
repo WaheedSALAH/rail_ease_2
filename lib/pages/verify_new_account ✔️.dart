@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 class Verify_Email extends StatefulWidget {
@@ -43,6 +44,11 @@ class _VerifyEmptyState extends State<Verify_Email> {
     super.dispose();
   }
 
+  void _resendCode() {
+    // Implement your resend code logic here
+    print("Resend code triggered");
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -71,7 +77,7 @@ class _VerifyEmptyState extends State<Verify_Email> {
                         child: IconButton(
                           icon: Icon(Icons.arrow_back),
                           onPressed: () {
-                            // Implement action to go back
+            Navigator.of(context).pop();
                           },
                         ),
                       ),
@@ -96,7 +102,7 @@ class _VerifyEmptyState extends State<Verify_Email> {
                         ),
                       ),
                       Text(
-                        'Code has been sent ✔️ ',
+                        'Code has been sent to your email ✔️ !',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontWeight: FontWeight.w400,
@@ -112,7 +118,7 @@ class _VerifyEmptyState extends State<Verify_Email> {
                   child: Align(
                     alignment: Alignment.topRight,
                     child: SizedBox(
-                      width: 305,
+                      width: 340,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -181,7 +187,7 @@ class _VerifyEmptyState extends State<Verify_Email> {
                     // Perform verification action here
                   },
                   child: Container(
-                    margin: EdgeInsets.fromLTRB(25, 0, 0, 0),
+                    margin: EdgeInsets.fromLTRB(25, 0, 0, 20),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(14),
                       color: _buttonColor,
@@ -206,6 +212,31 @@ class _VerifyEmptyState extends State<Verify_Email> {
                         ),
                       ),
                     ),
+                  ),
+                ),
+                RichText(
+                  text: TextSpan(
+                    text: 'Didn\'t receive the code? ',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w400,
+                      fontSize: 16,
+                      color: Color(0xFFA0A0A0),
+                    ),
+                    children: <TextSpan>[
+                      TextSpan(
+                        text: 'Resend code',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w400,
+                          fontSize: 16,
+                          color: Colors.blue,
+                          decoration: TextDecoration.underline,
+                        ),
+                        recognizer: TapGestureRecognizer()
+                          ..onTap = () {
+                            // Add action to navigate to login screen
+                          },
+                      ),
+                    ],
                   ),
                 ),
               ],

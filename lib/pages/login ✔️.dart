@@ -1,6 +1,10 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+
+import 'creation_an_account ✔️.dart';
+import 'forget ✔️.dart';
 
 class Login extends StatefulWidget {
   @override
@@ -21,19 +25,19 @@ class _LoginState extends State<Login> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Align(
-                alignment: Alignment.topLeft,
-                child: SizedBox(
-                  width: 45,
-                  height: 45,
-                  child: IconButton(
-                    icon: SvgPicture.asset('assets/vectors/back_17_x2.svg'),
-                    onPressed: () {
-                      // Implement action to go back
-                    },
-                  ),
-                ),
-              ),
+              // Align(
+              //   alignment: Alignment.topLeft,
+              //   child: SizedBox(
+              //     width: 45,
+              //     height: 45,
+              //     child: IconButton(
+              //       icon: SvgPicture.asset('assets/vectors/back_17_x2.svg'),
+              //       onPressed: () {
+              //         Navigator.pop(context);
+              //       },
+              //     ),
+              //   ),
+              // ),
               SizedBox(height: 20),
               Text(
                 'Welcome Back!',
@@ -52,7 +56,12 @@ class _LoginState extends State<Login> {
                 onTap: () {
                   setState(() {
                     _forgetPasswordClicked = !_forgetPasswordClicked;
-                    // Add action for forget password
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => Forget(),
+                      ),
+                    );
                   });
                 },
                 child: AnimatedContainer(
@@ -80,85 +89,100 @@ class _LoginState extends State<Login> {
                 ),
               ),
               SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  // Add your login action here
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor:
-                      Color(0xFFFF0000), // Specify primary color here
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  elevation: 2,
-                ),
-                child: Container(
-                  width: double.infinity,
-                  padding: EdgeInsets.symmetric(vertical: 15),
-                  child: Text(
-                    'Login',
-                    style: GoogleFonts.inika(
-                      fontWeight: FontWeight.w700,
-                      fontSize: 18,
-                      color: Colors.white,
+              Center(
+                child: ElevatedButton(
+                  onPressed: () {
+                    // Add action to create account
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color(0xFFFF0000),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
                     ),
-                    textAlign: TextAlign.center,
+                    elevation: 2,
+                  ),
+                  child: Container(
+                    width: 200,
+                    padding:
+                        EdgeInsets.symmetric(vertical: 11, horizontal: 6.8),
+                    child: Text(
+                      'Login',
+                      style: GoogleFonts.inika(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 18,
+                        letterSpacing: -0.4,
+                        color: Colors.white,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
                   ),
                 ),
               ),
+
               SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
-                    'Or Login with',
-                    style: GoogleFonts.inika(
-                      fontWeight: FontWeight.w700,
-                      fontSize: 16,
-                      color: Colors.black,
-                    ),
-                  ),
+                  // Text(
+                  //   'Or Login with',
+                  //   style: GoogleFonts.inika(
+                  //     fontWeight: FontWeight.w700,
+                  //     fontSize: 16,
+                  //     color: Colors.black,
+                  //   ),
+                  // ),
                 ],
               ),
               SizedBox(height: 10),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      // Add action for Facebook login
-                    },
-                    child: buildSocialLoginButton(
-                        'assets/vectors/vector_28_x2.svg'),
-                  ),
-                  SizedBox(width: 15),
-                  GestureDetector(
-                    onTap: () {
-                      // Add action for Google login
-                    },
-                    child: buildSocialLoginButton(
-                        'assets/vectors/group_123_x2.svg'),
-                  ),
-                ],
+                // children: [
+                //   GestureDetector(
+                //     onTap: () {
+                //       // Add action for Facebook login
+                //     },
+                //     child: buildSocialLoginButton(
+                //         'assets/vectors/vector_28_x2.svg'),
+                //   ),
+                //   SizedBox(width: 15),
+                //   GestureDetector(
+                //     onTap: () {
+                //       // Add action for Google login
+                //     },
+                //     child: buildSocialLoginButton(
+                //         'assets/vectors/group_123_x2.svg'),
+                //   ),
+                // ],
               ),
               SizedBox(height: 20),
-              InkWell(
-                onTap: () {
-                  setState(() {
-                    _registerNowClicked = !_registerNowClicked;
-                    // Add action for register now
-                  });
-                },
-                child: AnimatedDefaultTextStyle(
-                  duration: Duration(milliseconds: 300),
-                  style: GoogleFonts.poppins(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 18,
-                    color: _registerNowClicked ? Colors.red : Color(0xFF000000),
+              RichText(
+                text: TextSpan(
+                  text: 'Don’t have an account?',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w400,
+                    fontSize: 16,
+                    color: Color(0xFFA0A0A0),
                   ),
-                  child: Text(
-                    'Don’t have an account? Register Now',
-                  ),
+                  children: <TextSpan>[
+                    TextSpan(
+                      text: 'Register Now',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w400,
+                        fontSize: 16,
+                        color: Colors.blue,
+                        decoration: TextDecoration.underline,
+                      ),
+                      recognizer: TapGestureRecognizer()
+                        ..onTap = () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => CreationAnAccount(),
+                            ),
+                          );
+                        },
+                    ),
+                  ],
                 ),
               ),
             ],

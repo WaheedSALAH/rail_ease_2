@@ -27,14 +27,7 @@ class Forget extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                   color: Colors.red,
                 ),
-                child: Padding(
-                  padding: EdgeInsets.all(10),
-                  child: SvgPicture.asset(
-                    'assets/vectors/vector_241_x2.svg',
-                    width: 8.5,
-                    height: 14.9,
-                  ),
-                ),
+
               ),
               Text(
                 'Forgot password?',

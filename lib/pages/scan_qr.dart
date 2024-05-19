@@ -1,219 +1,166 @@
 import 'package:flutter/material.dart';
-import 'dart:ui';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:qr_code_scanner/qr_code_scanner.dart';
+import 'package:http/http.dart' as http;
 
-class ScanQr extends StatelessWidget {
+class ScanQr extends StatefulWidget {
+  @override
+  _ScanQrState createState() => _ScanQrState();
+}
+
+class _ScanQrState extends State<ScanQr> {
+  final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
+  QRViewController? controller;
+  String? qrText;
+  bool verifying = false;
+  String? verificationResult;
+
+  @override
+  void reassemble() {
+    super.reassemble();
+    if (controller != null) {
+      controller!.pauseCamera();
+    }
+    controller!.resumeCamera();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Color(0xFFFFFFFF),
-        borderRadius: BorderRadius.circular(35),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('QR Code Scanner'),
+        backgroundColor: Colors.red,
       ),
-      child: Stack(
-        children: [
-          Positioned(
-            right: -42,
-            top: 592,
-            child: Container(
-              width: 437,
-              height: 87,
-              decoration: BoxDecoration(
-                boxShadow: [
-                  BoxShadow(
-                    color: Color(0x40000000),
-                    offset: Offset(0, 4),
-                    blurRadius: 2,
-                  ),
-                ],
-              ),
-              child: SvgPicture.asset(
-                'assets/vectors/union_4_x2.svg',
+      body: Column(
+        children: <Widget>[
+          Expanded(
+            flex: 4,
+            child: QRView(
+              key: qrKey,
+              onQRViewCreated: _onQRViewCreated,
+              overlay: QrScannerOverlayShape(
+                borderColor: Colors.blue,
+                borderRadius: 10,
+                borderLength: 30,
+                borderWidth: 10,
+                cutOutSize: 200,
               ),
             ),
           ),
-          Container(
-            padding: EdgeInsets.fromLTRB(21, 133, 11, 5),
+          Expanded(
+            flex: 1,
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Container(
-                  margin: EdgeInsets.fromLTRB(0, 0, 16.6, 5),
-                  child: Text(
-                    'Scan QR Code  ',
-                    style: GoogleFonts.getFont(
-                      'Inika',
-                      fontWeight: FontWeight.w700,
-                      fontSize: 29,
-                      color: Color(0xFF000000),
-                    ),
-                  ),
-                ),
-                Container(
-                  margin: EdgeInsets.fromLTRB(0, 0, 13.5, 103),
-                  child: Text(
-                    'place QR inside the frame to scan ',
-                    style: GoogleFonts.getFont(
-                      'Inika',
-                      fontWeight: FontWeight.w400,
-                      fontSize: 14,
-                      color: Color(0xEDBBBBBB),
-                    ),
-                  ),
-                ),
-                Container(
-                  margin: EdgeInsets.fromLTRB(0, 0, 10.8, 91),
-                  child: SizedBox(
-                    width: 216.2,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          margin: EdgeInsets.fromLTRB(0, 0, 0, 0.1),
-                          child: SizedBox(
-                            width: 56.2,
-                            height: 63.9,
-                            child: SvgPicture.asset(
-                              'assets/vectors/vector_303_x2.svg',
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          width: 56,
-                          height: 64,
-                          child: SvgPicture.asset(
-                            'assets/vectors/vector_115_x2.svg',
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                Container(
-                  margin: EdgeInsets.fromLTRB(0, 0, 10.6, 29.1),
-                  child: SizedBox(
-                    width: 216.4,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SizedBox(
-                          width: 56.2,
-                          height: 63.9,
-                          child: SvgPicture.asset(
-                            'assets/vectors/vector_2_x2.svg',
-                          ),
-                        ),
-                        SizedBox(
-                          width: 56.2,
-                          height: 63.9,
-                          child: SvgPicture.asset(
-                            'assets/vectors/vector_209_x2.svg',
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                Container(
-                  margin: EdgeInsets.fromLTRB(0, 0, 13, 186),
-                  child: Text(
-                    'scanning Code...',
-                    style: GoogleFonts.getFont(
-                      'Inika',
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                if (qrText != null)
+                  Text(
+                    'Scan result: $qrText',
+                    style: GoogleFonts.inika(
                       fontWeight: FontWeight.w400,
                       fontSize: 14,
                       color: Color(0xFF595959),
                     ),
                   ),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      margin: EdgeInsets.fromLTRB(0, 2, 0, 0),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          image: DecorationImage(
-                            fit: BoxFit.contain,
-                            image: AssetImage(
-                              'assets/images/home.png',
-                            ),
-                          ),
-                        ),
-                        child: Container(
-                          width: 48,
-                          height: 56,
-                        ),
-                      ),
+                if (qrText == null)
+                  Text(
+                    'Scanning Code...',
+                    style: GoogleFonts.inika(
+                      fontWeight: FontWeight.w400,
+                      fontSize: 14,
+                      color: Color(0xFF595959),
                     ),
-                    Container(
-                      margin: EdgeInsets.fromLTRB(0, 0, 0, 8),
-                      child: SizedBox(
-                        width: 57,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Container(
-                              margin: EdgeInsets.fromLTRB(0, 0, 0, 7),
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  image: DecorationImage(
-                                    fit: BoxFit.contain,
-                                    image: AssetImage(
-                                      'assets/images/qr_code.png',
-                                    ),
-                                  ),
-                                ),
-                                child: Container(
-                                  width: 57,
-                                  height: 38,
-                                ),
-                              ),
-                            ),
-                            Container(
-                              decoration: BoxDecoration(
-                                color: Color(0xFFFFFFFF),
-                                borderRadius: BorderRadius.circular(2.5),
-                              ),
-                              child: Container(
-                                width: 5,
-                                height: 5,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                  ),
+                SizedBox(height: 10),
+                if (verifying)
+                  CircularProgressIndicator() // Show loading indicator while verifying
+                else if (verificationResult != null)
+                  Text(
+                    'Verification Result: $verificationResult',
+                    style: GoogleFonts.inika(
+                      fontWeight: FontWeight.w400,
+                      fontSize: 14,
+                      color: Color(0xFF595959),
                     ),
-                    Container(
-                      margin: EdgeInsets.fromLTRB(0, 8, 0, 8),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          image: DecorationImage(
-                            fit: BoxFit.contain,
-                            image: AssetImage(
-                              'assets/images/account.png',
-                            ),
-                          ),
-                        ),
-                        child: Container(
-                          width: 58,
-                          height: 42,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
               ],
             ),
-          ),
+          )
         ],
       ),
+    );
+  }
+
+  void _onQRViewCreated(QRViewController controller) {
+    this.controller = controller;
+    controller.scannedDataStream.listen((scanData) async {
+      setState(() {
+        qrText = scanData.code;
+        verifying = true;
+      });
+
+      // Send the scanned QR code data for verification
+      await _verifyQRCode(qrText!);
+    });
+  }
+
+  Future<void> _verifyQRCode(String qrData) async {
+    final String verificationEndpoint =
+        'YOUR_VERIFICATION_ENDPOINT'; // Replace with your Cloud Function endpoint
+    final String authToken =
+        'YOUR_FIREBASE_AUTH_TOKEN'; // Replace with Firebase auth token
+
+    try {
+      final response = await http.post(
+        Uri.parse(verificationEndpoint),
+        headers: {
+          'Authorization': 'Bearer $authToken',
+          'Content-Type': 'application/json',
+        },
+        body: {
+          'qrData': qrData,
+        },
+      );
+
+      if (response.statusCode == 200) {
+        // Verification successful
+        setState(() {
+          verificationResult = 'Verified';
+        });
+      } else {
+        // Verification failed
+        setState(() {
+          verificationResult = 'Not Verified';
+        });
+      }
+    } catch (e) {
+      // Handle error
+      setState(() {
+        verificationResult = 'Error: $e';
+      });
+    } finally {
+      // Set verifying to false after verification is complete
+      setState(() {
+        verifying = false;
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    controller?.dispose();
+    super.dispose();
+  }
+}
+
+void main() {
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: ScanQr(),
     );
   }
 }

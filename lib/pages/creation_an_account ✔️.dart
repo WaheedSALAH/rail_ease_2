@@ -1,6 +1,9 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+
+import 'login ✔️.dart';
 
 class CreationAnAccount extends StatelessWidget {
   @override
@@ -16,25 +19,25 @@ class CreationAnAccount extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(
-                width: 45,
-                height: 45,
-                child: IconButton(
-                  icon: SvgPicture.asset('assets/vectors/back_10_x2.svg'),
-                  onPressed: () {
-                    // Implement action to go back
-                  },
-                ),
-              ),
+              // SizedBox(
+              //   width: 45,
+              //   height: 45,
+              //   child: IconButton(
+              //     icon: SvgPicture.asset('assets/vectors/back_10_x2.svg'),
+              //     onPressed: () {
+              //       Navigator.pop(context);
+              //     },
+              //   ),
+              // ),
               SizedBox(height: 13),
-              Text(
+              Center(child: Text(
                 'Create an account',
                 style: GoogleFonts.inika(
                   fontWeight: FontWeight.w700,
-                  fontSize: 40,
+                  fontSize: 30,
                   color: Color(0xFFFF0000),
                 ),
-              ),
+              ),),
               SizedBox(height: 20),
               buildInputField('User name'),
               SizedBox(height: 10),
@@ -44,33 +47,36 @@ class CreationAnAccount extends StatelessWidget {
               SizedBox(height: 10),
               buildInputField('Confirm Password', obscureText: true),
               SizedBox(height: 33),
-              ElevatedButton(
-                onPressed: () {
-                  // Add action to create account
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFFFF0000),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  elevation: 2,
-                ),
-                child: Container(
-                  width: 284,
-                  padding: EdgeInsets.symmetric(vertical: 11, horizontal: 6.8),
-                  child: Text(
-                    'Create Account',
-                    style: GoogleFonts.inika(
-                      fontWeight: FontWeight.w700,
-                      fontSize: 18,
-                      letterSpacing: -0.4,
-                      color: Colors.white,
+              Center(
+                child: ElevatedButton(
+                  onPressed: () {
+                    // Add action to create account
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color(0xFFFF0000),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
                     ),
-                    textAlign: TextAlign.center,
+                    elevation: 2,
+                  ),
+                  child: Container(
+                    width: 200,
+                    padding:
+                        EdgeInsets.symmetric(vertical: 11, horizontal: 6.8),
+                    child: Text(
+                      'Create Account',
+                      style: GoogleFonts.inika(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 18,
+                        letterSpacing: -0.4,
+                        color: Colors.white,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
                   ),
                 ),
               ),
-              SizedBox(height: 75),
+              SizedBox(height: 40),
               Divider(
                 color: Colors.black,
                 height: 1,
@@ -90,44 +96,51 @@ class CreationAnAccount extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  buildSocialLoginButton('assets/vectors/vector_193_x2.svg'),
+                  GestureDetector(
+                    onTap: () {
+                      // Add action for Facebook login
+                    },
+                    child: buildSocialLoginButton(
+                        'assets/vectors/vector_28_x2.svg'),
+                  ),
                   SizedBox(width: 15),
-                  buildSocialLoginButton('assets/vectors/group_1231_x2.svg'),
+                  GestureDetector(
+                    onTap: () {
+                      // Add action for Google login
+                    },
+                    child: buildSocialLoginButton(
+                        'assets/vectors/group_123_x2.svg'),
+                  ),
                 ],
               ),
               SizedBox(height: 23.3),
-              InkWell(
-                onTap: () {
-                  // Add action to navigate to login screen
-                },
+              Center(
                 child: RichText(
                   text: TextSpan(
-                    style: GoogleFonts.poppins(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 18,
-                      height: 1.4,
-                      letterSpacing: 0.2,
-                      color: Color(0xFF151414),
+                    text: 'I Already Have an Account ',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w400,
+                      fontSize: 16,
+                      color: Color(0xFFA0A0A0),
                     ),
-                    children: [
-                      TextSpan(
-                        text: 'I Already Have an Account ',
-                        style: GoogleFonts.inika(
-                          fontWeight: FontWeight.w400,
-                          fontSize: 18,
-                          height: 1.3,
-                          letterSpacing: 0.2,
-                        ),
-                      ),
+                    children: <TextSpan>[
                       TextSpan(
                         text: 'Login',
-                        style: GoogleFonts.inika(
-                          fontWeight: FontWeight.w700,
-                          fontSize: 18,
-                          height: 1.3,
-                          letterSpacing: 0.2,
-                          color: Color(0xFFFF0000),
+                        style: TextStyle(
+                          fontWeight: FontWeight.w400,
+                          fontSize: 16,
+                          color: Colors.blue,
+                          decoration: TextDecoration.underline,
                         ),
+                        recognizer: TapGestureRecognizer()
+                          ..onTap = () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => Login(),
+                              ),
+                            );
+                          },
                       ),
                     ],
                   ),
