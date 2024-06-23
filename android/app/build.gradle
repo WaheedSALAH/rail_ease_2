@@ -1,5 +1,8 @@
 plugins {
     id "com.android.application"
+    // START: FlutterFire Configuration
+    id 'com.google.gms.google-services'
+    // END: FlutterFire Configuration
     id "kotlin-android"
     id "dev.flutter.flutter-gradle-plugin"
 }
@@ -41,8 +44,8 @@ android {
 
     defaultConfig {
         applicationId "com.example.rail_ease"
-        minSdkVersion 20 // Modify this line
-        targetSdkVersion 30
+        minSdkVersion flutter.minSdkVersion // Modify this line
+        targetSdkVersion 33
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
     }

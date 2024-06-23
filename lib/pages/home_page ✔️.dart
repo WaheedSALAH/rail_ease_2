@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'creation_an_account ✔️.dart';
-import 'login ✔️.dart';
-
-
 class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -12,7 +8,7 @@ class HomePage extends StatelessWidget {
       body: Stack(
         children: [
           Container(
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               image: DecorationImage(
                 image: AssetImage('assets/images/home_page.jpeg'),
                 fit: BoxFit.cover,
@@ -26,12 +22,7 @@ class HomePage extends StatelessWidget {
               children: [
                 GestureDetector(
                   onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => CreationAnAccount(),
-                      ),
-                    );
+                    Navigator.pushReplacementNamed(context, '/register');
                   },
                   child: Container(
                     margin: EdgeInsets.only(bottom: 20),
@@ -58,12 +49,7 @@ class HomePage extends StatelessWidget {
                 ),
                 GestureDetector(
                   onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => Login(),
-                      ),
-                    );
+                    Navigator.pushReplacementNamed(context, '/login');
                   },
                   child: Container(
                     width: 250,

@@ -6,7 +6,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:rail_ease/pages/change_email ✔️.dart';
 
-import 'change_password ✔️.dart';
 import 'menu ✔️.dart';
 
 class EditProfile extends StatefulWidget {
@@ -36,7 +35,7 @@ class _EditProfileState extends State<EditProfile> {
 
   Future<void> _pickImage() async {
     final picker = ImagePicker();
-    final pickedFile = await picker.getImage(source: ImageSource.gallery);
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       setState(() {
         _selectedImage = File(pickedFile.path);

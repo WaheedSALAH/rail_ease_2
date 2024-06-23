@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+  <string name="app_name">Rail Ease</string>
+  <string name="facebook_app_id">1203732037660984</string>
+  <string name="facebook_client_token">356efcf52e49ecdb0e07f2d0ce2cc6b0</string>
+  <string name="fb_login_protocol_scheme">fb66982f529de3c51a769f01871302c6da</string>
+</resources>

@@ -1,8 +1,25 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class Forget extends StatelessWidget {
+  final TextEditingController emailController = TextEditingController();
+
+  Future<void> resetPassword(BuildContext context) async {
+    try {
+      await FirebaseAuth.instance
+          .sendPasswordResetEmail(email: emailController.text);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Password reset email sent')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to send password reset email: $e')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -27,7 +44,6 @@ class Forget extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                   color: Colors.red,
                 ),
-
               ),
               Text(
                 'Forgot password?',
@@ -62,6 +78,7 @@ class Forget extends StatelessWidget {
                     SizedBox(width: 10),
                     Expanded(
                       child: TextField(
+                        controller: emailController,
                         decoration: InputDecoration(
                           border: InputBorder.none,
                           hintText: 'Enter your email address',
@@ -89,7 +106,9 @@ class Forget extends StatelessWidget {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    resetPassword(context); // Call the resetPassword function
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.red,
                     elevation: 4,

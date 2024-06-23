@@ -3,12 +3,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:rail_ease/pages/basic_page%20%E2%9C%94%EF%B8%8F.dart';
 
-void main() {
-  runApp(MaterialApp(
-    home: OnboardingScreen(),
-  ));
-}
-
 class OnboardingScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {

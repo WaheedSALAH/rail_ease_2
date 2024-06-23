@@ -1,10 +1,10 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:rail_ease/pages/basic_page%20%E2%9C%94%EF%B8%8F.dart';
 import 'package:rail_ease/pages/edit_profile%20%E2%9C%94%EF%B8%8F.dart';
-import 'package:rail_ease/pages/Train_location.dart';
 import 'package:rail_ease/pages/scan_qr.dart';
 import 'package:rail_ease/pages/settings%20%E2%9C%94%EF%B8%8F.dart';
 
-import 'basic_page ✔️.dart';
 import 'notifications.dart'; // Import BasicPage
 
 class MenuItem {
@@ -24,22 +24,25 @@ class Menu extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Logout Confirmation'),
-        content: Text(
+        title: const Text('Logout Confirmation'),
+        content: const Text(
             "Are you sure you want to log out? You'll need to login again to use the app."),
         actions: <Widget>[
           TextButton(
             onPressed: () {
               Navigator.of(context).pop(); // Close the dialog
             },
-            child: Text('Cancel'),
+            child: const Text('Cancel'),
           ),
           TextButton(
-            onPressed: () {
+            onPressed: () async {
               // Perform logout logic here
+              await FirebaseAuth.instance.signOut();
               Navigator.of(context).pop(); // Close the dialog
+              Navigator.pushReplacementNamed(
+                  context, '/login'); // Navigate to home page
             },
-            child: Text('Logout'),
+            child: const Text('Logout'),
           ),
         ],
       ),
@@ -118,9 +121,9 @@ class Menu extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Menu'),
+        title: const Text('Menu'),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.push(
               context,
@@ -150,12 +153,12 @@ class Menu extends StatelessWidget {
                             Icon(
                               menuItem.iconData,
                               size: 50,
-                              color: Color.fromARGB(255, 0, 0, 0),
+                              color: const Color.fromARGB(255, 0, 0, 0),
                             ),
-                            SizedBox(width: 16),
+                            const SizedBox(width: 16),
                             Text(
                               menuItem.title,
-                              style: TextStyle(
+                              style: const TextStyle(
                                 color: Color(0xC1020202),
                                 fontSize: 18,
                                 fontFamily: 'Inika',
