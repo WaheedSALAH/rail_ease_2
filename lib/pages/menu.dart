@@ -1,9 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:rail_ease/pages/basic_page%20%E2%9C%94%EF%B8%8F.dart';
-import 'package:rail_ease/pages/edit_profile%20%E2%9C%94%EF%B8%8F.dart';
+import 'package:rail_ease/pages/basic_page%20.dart';
+import 'package:rail_ease/pages/edit_profile .dart';
 import 'package:rail_ease/pages/scan_qr.dart';
-import 'package:rail_ease/pages/settings%20%E2%9C%94%EF%B8%8F.dart';
+import 'package:rail_ease/pages/settings.dart';
 
 import 'notifications.dart'; // Import BasicPage
 

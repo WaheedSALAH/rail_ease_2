@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:rail_ease/pages/forget.dart';
 
-import 'edit_profile ✔️.dart';
-import 'forget ✔️.dart'; // Import the ForgetPassword page
+import 'edit_profile .dart';
 
 void main() {
   runApp(MaterialApp(

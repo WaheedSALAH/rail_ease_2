@@ -5,8 +5,8 @@ import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:rail_ease/auth/login%20%E2%9C%94%EF%B8%8F.dart';
-import 'package:rail_ease/pages/onboarding_screen%20%E2%9C%94%EF%B8%8F.dart';
+import 'package:rail_ease/auth/login.dart';
+import 'package:rail_ease/pages/onboarding_screen.dart';
 
 class CreationAnAccount extends StatefulWidget {
   const CreationAnAccount({super.key});

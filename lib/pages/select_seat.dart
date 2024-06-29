@@ -1,11 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'add_card ✔️.dart';
+import 'package:rail_ease/pages/add_card.dart';
 
 class SelectSeat extends StatefulWidget {
-  final String? selectedTrainImage; // Make the parameter nullable
+  final String arrivalStation;
+  final String currentStation;
+  final String ticketPrice;
+  final String numberOfStops;
+  final String tripDuration;
+  final String trainType;
+  final String arrivalTimeToStation;
+  final String arrivalTimeToDestinationStation;
 
-  SelectSeat({this.selectedTrainImage}); // Make the parameter optional
+  SelectSeat({
+    required this.arrivalStation,
+    required this.currentStation,
+    required this.ticketPrice,
+    required this.numberOfStops,
+    required this.tripDuration,
+    required this.trainType,
+    required this.arrivalTimeToStation,
+    required this.arrivalTimeToDestinationStation,
+  });
 
   @override
   _SelectSeatState createState() => _SelectSeatState();
@@ -66,16 +82,47 @@ class _SelectSeatState extends State<SelectSeat> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(
-                height: 140,
-                child: Container(
-                  alignment: Alignment.center,
-                  child: Image.asset(
-                    widget.selectedTrainImage ?? 'assets/images/train1.png',
-                    fit: BoxFit.contain,
+              // Display the train details
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(widget.currentStation,
+                          style: TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.bold)),
+                      Text(widget.arrivalTimeToStation,
+                          style: TextStyle(fontSize: 16, color: Colors.red)),
+                    ],
                   ),
-                ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(widget.arrivalStation,
+                          style: TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.bold)),
+                      Text(widget.arrivalTimeToDestinationStation,
+                          style: TextStyle(fontSize: 16, color: Colors.red)),
+                    ],
+                  ),
+                ],
               ),
+              SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(widget.tripDuration, style: TextStyle(fontSize: 16)),
+                  Text('${widget.numberOfStops} stops',
+                      style: TextStyle(fontSize: 16)),
+                ],
+              ),
+              SizedBox(height: 10),
+              Text('Price: ${widget.ticketPrice}',
+                  style: TextStyle(fontSize: 16, color: Colors.red)),
+              SizedBox(height: 10),
+              Text(widget.trainType,
+                  style: TextStyle(fontSize: 16, color: Colors.red)),
               SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -94,7 +141,7 @@ class _SelectSeatState extends State<SelectSeat> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Total Price: $totalPrice LE', // Display total price
+                    'Total Price: $totalPrice', // Display total price
                     style: _getTextStyle(Colors.red),
                   ),
                   GestureDetector(
@@ -102,8 +149,10 @@ class _SelectSeatState extends State<SelectSeat> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) =>
-                              AddCard(), // Navigate to AddCart page
+                          builder: (context) => AddCard(
+                            totalPrice: totalPrice,
+                            trainData: {},
+                          ), // Pass totalPrice to AddCard
                         ),
                       );
                     },
@@ -112,8 +161,10 @@ class _SelectSeatState extends State<SelectSeat> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) =>
-                                AddCard(), // Navigate to AddCart page
+                            builder: (context) => AddCard(
+                              totalPrice: totalPrice,
+                              trainData: {},
+                            ), // Pass totalPrice to AddCard
                           ),
                         );
                       },

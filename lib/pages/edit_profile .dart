@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:rail_ease/pages/change_email ✔️.dart';
+import 'package:rail_ease/pages/change_email .dart';
 
-import 'menu ✔️.dart';
+import 'menu.dart';
 
 class EditProfile extends StatefulWidget {
   @override

@@ -1,10 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:rail_ease/pages/Train_location.dart';
-import 'package:rail_ease/pages/menu%20%E2%9C%94%EF%B8%8F.dart';
+import 'package:rail_ease/pages/menu.dart';
+import 'package:rail_ease/pages/select_your_train.dart';
 
 import 'my_ticket.dart';
 import 'notifications.dart';
-import 'select_your_train ✔️.dart';
 
 void main() {
   runApp(MyApp());
@@ -20,7 +20,15 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class BasicPage extends StatelessWidget {
+class BasicPage extends StatefulWidget {
+  @override
+  _BasicPageState createState() => _BasicPageState();
+}
+
+class _BasicPageState extends State<BasicPage> {
+  String? _currentStation;
+  String? _arrivalStation;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -45,8 +53,18 @@ class BasicPage extends StatelessWidget {
         child: Column(
           children: [
             Header(),
-            SearchForm(),
-            Footer(),
+            SearchForm(
+              onStationChanged: (current, arrival) {
+                setState(() {
+                  _currentStation = current;
+                  _arrivalStation = arrival;
+                });
+              },
+            ),
+            Footer(
+              currentStation: _currentStation,
+              arrivalStation: _arrivalStation,
+            ),
             SizedBox(
               height: 100,
             ),
@@ -175,6 +193,10 @@ class GradientContainer extends StatelessWidget {
 }
 
 class SearchForm extends StatefulWidget {
+  final Function(String?, String?) onStationChanged;
+
+  const SearchForm({required this.onStationChanged});
+
   @override
   _SearchFormState createState() => _SearchFormState();
 }
@@ -184,7 +206,27 @@ class _SearchFormState extends State<SearchForm> {
   String? _currentStation;
   String? _arrivalStation;
 
-  final List<String> stations = ['Zagazig', 'Cairo', 'Faqous'];
+  List<String> stations = [];
+
+  @override
+  void initState() {
+    super.initState();
+    fetchStations();
+  }
+
+  Future<void> fetchStations() async {
+    try {
+      QuerySnapshot snapshot = await FirebaseFirestore.instance
+          .collection('Stations between Cairo and Zagazig')
+          .get();
+      List<String> stationList = snapshot.docs.map((doc) => doc.id).toList();
+      setState(() {
+        stations = stationList;
+      });
+    } catch (e) {
+      print(e);
+    }
+  }
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -227,7 +269,7 @@ class _SearchFormState extends State<SearchForm> {
           SizedBox(height: 20), // Add space between fields
 
           DropdownButtonFormField<String>(
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
               labelText: 'Choose Current Station',
               border: OutlineInputBorder(),
               suffixIcon: Icon(Icons.keyboard_arrow_down),
@@ -242,6 +284,7 @@ class _SearchFormState extends State<SearchForm> {
             onChanged: (value) {
               setState(() {
                 _currentStation = value;
+                widget.onStationChanged(_currentStation, _arrivalStation);
               });
             },
           ),
@@ -279,6 +322,7 @@ class _SearchFormState extends State<SearchForm> {
             onChanged: (value) {
               setState(() {
                 _arrivalStation = value;
+                widget.onStationChanged(_currentStation, _arrivalStation);
               });
             },
           ),
@@ -288,61 +332,12 @@ class _SearchFormState extends State<SearchForm> {
   }
 }
 
-class TrainInfoItem extends StatelessWidget {
-  final String title;
-  final String value;
-  final VoidCallback? onIncrement;
-  final VoidCallback? onDecrement;
-
-  const TrainInfoItem({
-    required this.title,
-    required this.value,
-    this.onIncrement,
-    this.onDecrement,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        children: [
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 12,
-              fontFamily: 'Inika',
-              fontWeight: FontWeight.w400,
-            ),
-          ),
-          Spacer(),
-          Row(
-            children: [
-              IconButton(
-                icon: Icon(Icons.remove),
-                onPressed: onDecrement,
-              ),
-              Text(
-                value,
-                style: TextStyle(
-                  fontSize: 12,
-                  fontFamily: 'Inika',
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-              IconButton(
-                icon: Icon(Icons.add),
-                onPressed: onIncrement,
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 class Footer extends StatelessWidget {
+  final String? currentStation;
+  final String? arrivalStation;
+
+  const Footer({required this.currentStation, required this.arrivalStation});
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -352,12 +347,23 @@ class Footer extends StatelessWidget {
           color: Colors.transparent,
           child: InkWell(
             onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => SelectYourTrain(),
-                ),
-              );
+              if (currentStation == null || arrivalStation == null) {
+                // Show an error message
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Please select both stations.'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              } else {
+                // Navigate to SelectYourTrain page
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => SelectYourTrain(),
+                  ),
+                );
+              }
             },
             child: Container(
               width: 284,
@@ -366,7 +372,7 @@ class Footer extends StatelessWidget {
                 color: Color(0xFFFF0000),
                 borderRadius: BorderRadius.circular(14),
               ),
-              child: Center(
+              child: const Center(
                 child: Text(
                   'Search train',
                   style: TextStyle(

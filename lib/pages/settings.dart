@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'change_password ✔️.dart';
-import 'delete_account ✔️.dart';
+
+import 'change_password .dart';
+import 'delete_account .dart';
 import 'language.dart';
 import 'privacy_policy.dart'; // Import Language page
 

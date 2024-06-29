@@ -49,6 +49,9 @@ dependencies:
   awesome_dialog: ^3.2.1
   google_sign_in: ^6.2.1
   flutter_facebook_auth: ^7.0.0
+  http: ^1.2.1
+  dio: ^4.0.0
+  location: ^6.0.2
 
 dev_dependencies:
   flutter_test:

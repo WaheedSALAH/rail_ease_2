@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:rail_ease/pages/basic_page%20%E2%9C%94%EF%B8%8F.dart';
+import 'package:rail_ease/pages/basic_page%20.dart';
 
 class OnboardingScreen extends StatelessWidget {
   @override
