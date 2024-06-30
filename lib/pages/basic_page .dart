@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:rail_ease/pages/menu.dart';
 import 'package:rail_ease/pages/select_your_train.dart';
-
 import 'my_ticket.dart';
 import 'notifications.dart';
 
@@ -34,7 +33,7 @@ class _BasicPageState extends State<BasicPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Rail Ease'),
-        automaticallyImplyLeading: false, // This line removes the back button
+        automaticallyImplyLeading: false,
         actions: [
           IconButton(
             icon: Icon(Icons.menu),
@@ -86,8 +85,7 @@ class _BasicPageState extends State<BasicPage> {
             ),
             IconButton(
               icon: ImageIcon(
-                AssetImage(
-                    'assets/images/ticket.png'), // Replace 'ticket_icon.png' with your image asset path
+                AssetImage('assets/images/ticket.png'), // Replace 'ticket_icon.png' with your image asset path
                 size: 32, // Adjust the size as needed
                 // color: Colors.red, // Customize the color as needed
               ),
@@ -111,8 +109,8 @@ class _BasicPageState extends State<BasicPage> {
               icon: Icon(Icons.train),
               onPressed: () {
                 // Navigator.push(
-                //   context,
-                //   // MaterialPageRoute(builder: (context) => Location()),
+                // context,
+                // MaterialPageRoute(builder: (context) => Location()),
                 // );
               },
             ),
@@ -194,9 +192,7 @@ class GradientContainer extends StatelessWidget {
 
 class SearchForm extends StatefulWidget {
   final Function(String?, String?) onStationChanged;
-
   const SearchForm({required this.onStationChanged});
-
   @override
   _SearchFormState createState() => _SearchFormState();
 }
@@ -205,7 +201,6 @@ class _SearchFormState extends State<SearchForm> {
   DateTime? _selectedDate;
   String? _currentStation;
   String? _arrivalStation;
-
   List<String> stations = [];
 
   @override
@@ -219,7 +214,8 @@ class _SearchFormState extends State<SearchForm> {
       QuerySnapshot snapshot = await FirebaseFirestore.instance
           .collection('Stations between Cairo and Zagazig')
           .get();
-      List<String> stationList = snapshot.docs.map((doc) => doc.id).toList();
+      List<String> stationList =
+          snapshot.docs.map((doc) => doc.id).toList();
       setState(() {
         stations = stationList;
       });
@@ -267,7 +263,6 @@ class _SearchFormState extends State<SearchForm> {
             ),
           ),
           SizedBox(height: 20), // Add space between fields
-
           DropdownButtonFormField<String>(
             decoration: const InputDecoration(
               labelText: 'Choose Current Station',
@@ -289,7 +284,6 @@ class _SearchFormState extends State<SearchForm> {
             },
           ),
           SizedBox(height: 5), // Add space between fields
-
           Stack(
             alignment: Alignment.center,
             children: [
@@ -335,9 +329,7 @@ class _SearchFormState extends State<SearchForm> {
 class Footer extends StatelessWidget {
   final String? currentStation;
   final String? arrivalStation;
-
   const Footer({required this.currentStation, required this.arrivalStation});
-
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -360,7 +352,10 @@ class Footer extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => SelectYourTrain(),
+                    builder: (context) => SelectYourTrain(
+                      currentStation: currentStation!,
+                      arrivalStation: arrivalStation!,
+                    ),
                   ),
                 );
               }

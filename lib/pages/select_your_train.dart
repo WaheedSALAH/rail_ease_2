@@ -1,9 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-
 import 'select_seat.dart';
 
 class SelectYourTrain extends StatefulWidget {
+  final String currentStation;
+  final String arrivalStation;
+
+  SelectYourTrain({required this.currentStation, required this.arrivalStation});
+
   @override
   _SelectYourTrainState createState() => _SelectYourTrainState();
 }
@@ -40,14 +44,13 @@ class _SelectYourTrainState extends State<SelectYourTrain> {
                         children: [
                           Icon(Icons.train),
                           SizedBox(width: 8),
-                          Text('Cairo', style: TextStyle(fontSize: 16)),
+                          Text(widget.currentStation, style: TextStyle(fontSize: 16)),
                         ],
                       ),
                     ),
                   ),
                 ),
-                Icon(Icons.swap_vert,
-                    size: 40, color: Color.fromARGB(255, 244, 139, 155)),
+                Icon(Icons.swap_vert, size: 40, color: Color.fromARGB(255, 244, 139, 155)),
                 Expanded(
                   child: Container(
                     decoration: BoxDecoration(
@@ -60,15 +63,14 @@ class _SelectYourTrainState extends State<SelectYourTrain> {
                         children: [
                           Icon(Icons.train),
                           SizedBox(width: 8),
-                          Text('Zagazig', style: TextStyle(fontSize: 16)),
+                          Text(widget.arrivalStation, style: TextStyle(fontSize: 16)),
                         ],
                       ),
                     ),
                   ),
                 ),
                 IconButton(
-                  icon: Icon(Icons.close,
-                      color: Color.fromARGB(255, 241, 109, 109)),
+                  icon: Icon(Icons.close, color: Color.fromARGB(255, 241, 109, 109)),
                   onPressed: () {
                     // Action for clearing or resetting
                   },
@@ -79,14 +81,13 @@ class _SelectYourTrainState extends State<SelectYourTrain> {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Text(
-              'Cairo: 23 train/day',
+              '${widget.currentStation}: 23 train/day',
               style: TextStyle(fontSize: 16, color: Colors.black54),
             ),
           ),
           Expanded(
             child: StreamBuilder(
-              stream:
-                  FirebaseFirestore.instance.collection('Trains').snapshots(),
+              stream: FirebaseFirestore.instance.collection('Trains').snapshots(),
               builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
                 if (!snapshot.hasData) {
                   return Center(child: CircularProgressIndicator());
@@ -100,15 +101,12 @@ class _SelectYourTrainState extends State<SelectYourTrain> {
                       padding: const EdgeInsets.symmetric(vertical: 4.0),
                       child: Card(
                         child: ListTile(
-                          title: Text(
-                              '${train['Train number']} - ${train['Type']}'),
+                          title: Text('${train['Train number']} - ${train['Type']}'),
                           subtitle: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                  'Exp. Time: ${train['Arrival time to the station']}'),
-                              Text(
-                                  'Ar. Time: ${train['Arrival time to the destination station']}'),
+                              Text('Exp. Time: ${train['Arrival time to the station']}'),
+                              Text('Ar. Time: ${train['Arrival time to the destination station']}'),
                               Text('Track: ${train['Track number']}'),
                             ],
                           ),
@@ -116,8 +114,7 @@ class _SelectYourTrainState extends State<SelectYourTrain> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    TrainDetailsPage(trainId: train.id),
+                                builder: (context) => TrainDetailsPage(trainId: train.id),
                               ),
                             );
                           },
@@ -148,8 +145,7 @@ class TrainDetailsPage extends StatelessWidget {
         backgroundColor: Color(0xFFFF0000),
       ),
       body: FutureBuilder(
-        future:
-            FirebaseFirestore.instance.collection('Trains').doc(trainId).get(),
+        future: FirebaseFirestore.instance.collection('Trains').doc(trainId).get(),
         builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
           if (!snapshot.hasData) {
             return Center(child: CircularProgressIndicator());
@@ -160,50 +156,31 @@ class TrainDetailsPage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Train Number: ${train['Train number']}',
-                    style:
-                        TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                Text('Train Number: ${train['Train number']}', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                 SizedBox(height: 10),
-
-                Text('Train Direction : ${train['Direction']}',
-                    style: TextStyle(fontSize: 16)),
+                Text('Train Direction : ${train['Direction']}', style: TextStyle(fontSize: 16)),
                 SizedBox(height: 10),
-
-                Text('Current Station : ${train['Current station']}',
-                    style: TextStyle(fontSize: 16)),
+                Text('Current Station : ${train['Current station']}', style: TextStyle(fontSize: 16)),
                 SizedBox(height: 10),
-                Text('Arrival Station : ${train['Arrival station']}',
-                    style: TextStyle(fontSize: 16)),
+                Text('Arrival Station : ${train['Arrival station']}', style: TextStyle(fontSize: 16)),
                 SizedBox(height: 10),
-                Text('Starting Station : ${train['Starting station']}',
-                    style: TextStyle(fontSize: 16)),
+                Text('Starting Station : ${train['Starting station']}', style: TextStyle(fontSize: 16)),
                 SizedBox(height: 10),
-                Text('Number of Stations : ${train['Number of stations']}',
-                    style: TextStyle(fontSize: 16)),
+                Text('Number of Stations : ${train['Number of stations']}', style: TextStyle(fontSize: 16)),
+                // SizedBox(height: 10),
+                // Text('Number of Stops between ${widget.currentStation} & ${widget.arrivalStation} : ${train['Number of stops']}', style: TextStyle(fontSize: 15)),
                 SizedBox(height: 10),
-                Text(
-                    'Number of Stops between Cairo & Zagazig : ${train['Number of stops']}',
-                    style: TextStyle(fontSize: 15)),
+                Text('Trip Duration : ${train['Trip duration']}', style: TextStyle(fontSize: 16)),
                 SizedBox(height: 10),
-                Text('Trip Duration : ${train['Trip duration']}',
-                    style: TextStyle(fontSize: 16)),
+                Text('Ticket Price : ${train['Ticket price']}', style: TextStyle(fontSize: 16)),
                 SizedBox(height: 10),
-                Text('Ticket Price : ${train['Ticket price']}',
-                    style: TextStyle(fontSize: 16)),
+                Text('Train Type : ${train['Type']}', style: TextStyle(fontSize: 16)),
                 SizedBox(height: 10),
-                Text('Train Type : ${train['Type']}',
-                    style: TextStyle(fontSize: 16)),
+                Text('Arrival Time To Station: ${train['Arrival time to the station']}', style: TextStyle(fontSize: 16)),
                 SizedBox(height: 10),
-                Text(
-                    'Arrival Time To Station: ${train['Arrival time to the station']}',
-                    style: TextStyle(fontSize: 16)),
+                Text('Arrival Time To Destination Station: ${train['Arrival time to the destination station']}', style: TextStyle(fontSize: 15)),
                 SizedBox(height: 10),
-                Text(
-                    'Arrival Time To Destination Station: ${train['Arrival time to the destination station']}',
-                    style: TextStyle(fontSize: 15)),
-                SizedBox(height: 10),
-                Text('Track Number: ${train['Track number']}',
-                    style: TextStyle(fontSize: 16)),
+                Text('Track Number: ${train['Track number']}', style: TextStyle(fontSize: 16)),
                 // Add more details as needed
                 SizedBox(height: 20),
                 Center(
@@ -215,28 +192,21 @@ class TrainDetailsPage extends StatelessWidget {
                           builder: (context) => SelectSeat(
                             arrivalStation: train['Arrival station'],
                             currentStation: train['Current station'],
-                            ticketPrice: train['Ticket price']
-                                .toString(), // Convert to string
-                            numberOfStops: train['Number of stops']
-                                .toString(), // Convert to string
+                            ticketPrice: train['Ticket price'].toString(), // Convert to string
+                            numberOfStops: train['Number of stops'].toString(), // Convert to string
                             tripDuration: train['Trip duration'],
                             trainType: train['Type'],
-                            arrivalTimeToStation:
-                                train['Arrival time to the station'],
-                            arrivalTimeToDestinationStation: train[
-                                'Arrival time to the destination station'],
+                            arrivalTimeToStation: train['Arrival time to the station'],
+                            arrivalTimeToDestinationStation: train['Arrival time to the destination station'],
                           ),
                         ),
                       );
                     },
                     child: Text('Select Seat'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(
-                          0xFFFF0000), // Use backgroundColor instead of primary
-                      foregroundColor: Colors
-                          .white, // Use foregroundColor instead of onPrimary
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+                      backgroundColor: Color(0xFFFF0000), // Use backgroundColor instead of primary
+                      foregroundColor: Colors.white, // Use foregroundColor instead of onPrimary
+                      padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
                       textStyle: TextStyle(fontSize: 18),
                     ),
                   ),
