@@ -9,6 +9,11 @@ class SelectYourTrain extends StatefulWidget {
 
   SelectYourTrain({required this.currentStation, required this.arrivalStation});
 
+  final String currentStation;
+  final String arrivalStation;
+
+  SelectYourTrain({required this.currentStation, required this.arrivalStation});
+
   @override
   _SelectYourTrainState createState() => _SelectYourTrainState();
 }
@@ -81,6 +86,7 @@ class _SelectYourTrainState extends State<SelectYourTrain> {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Text(
+              '${widget.currentStation}: 23 train/day',
               '${widget.currentStation}: 23 train/day',
               style: TextStyle(fontSize: 16, color: Colors.black54),
             ),

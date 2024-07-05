@@ -70,7 +70,7 @@ class _BasicPageState extends State<BasicPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Rail Ease'),
-        automaticallyImplyLeading: false,
+        automaticallyImplyLeading: false, // This line removes the back button
         actions: [
           IconButton(
             icon: Icon(Icons.menu),
