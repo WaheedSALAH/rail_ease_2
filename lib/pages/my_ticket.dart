@@ -135,7 +135,7 @@ class MyTicket extends StatelessWidget {
   }
 
   String _generateQrData(TicketData ticket) {
-    return '${ticket.trainNumber},${ticket.currentStation},${ticket.arrivalStation}';
+    return '${ticket.trainNumber} , ${ticket.currentStation} , ${ticket.arrivalStation} , $totalPrice EGP';
   }
 
   Future<void> saveTicket(TicketData ticket) async {
