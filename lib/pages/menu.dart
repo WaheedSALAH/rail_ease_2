@@ -1,11 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:rail_ease/pages/basic_page%20.dart';
-import 'package:rail_ease/pages/edit_profile .dart';
+import 'package:rail_ease/pages/edit_profile.dart';
+import 'package:rail_ease/pages/notifications.dart';
 import 'package:rail_ease/pages/scan_qr.dart';
 import 'package:rail_ease/pages/settings.dart';
-
-import 'notifications.dart'; // Import BasicPage
+import 'package:rail_ease/pages/train_location.dart'; // Import TrainLocation page
 
 class MenuItem {
   final String title;
@@ -68,12 +68,12 @@ class Menu extends StatelessWidget {
         title: 'Train Location',
         iconData: Icons.train,
         onTap: () {
-          // Navigator.push(
-          //   context,
-          //   MaterialPageRoute(
-          //     builder: (context) => Location(),
-          //   ),
-          // );
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => CustomeGoogleMap(),
+            ),
+          );
         },
       ),
       MenuItem(

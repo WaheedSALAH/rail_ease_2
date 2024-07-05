@@ -4,16 +4,16 @@ import 'package:flutter/material.dart';
 import 'select_seat.dart';
 
 class SelectYourTrain extends StatefulWidget {
+  final String currentStation;
+  final String arrivalStation;
+
+  SelectYourTrain({required this.currentStation, required this.arrivalStation});
+
   @override
   _SelectYourTrainState createState() => _SelectYourTrainState();
 }
 
 class _SelectYourTrainState extends State<SelectYourTrain> {
-  @override
-  void initState() {
-    super.initState();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -40,7 +40,8 @@ class _SelectYourTrainState extends State<SelectYourTrain> {
                         children: [
                           Icon(Icons.train),
                           SizedBox(width: 8),
-                          Text('Cairo', style: TextStyle(fontSize: 16)),
+                          Text(widget.currentStation,
+                              style: TextStyle(fontSize: 16)),
                         ],
                       ),
                     ),
@@ -60,7 +61,8 @@ class _SelectYourTrainState extends State<SelectYourTrain> {
                         children: [
                           Icon(Icons.train),
                           SizedBox(width: 8),
-                          Text('Zagazig', style: TextStyle(fontSize: 16)),
+                          Text(widget.arrivalStation,
+                              style: TextStyle(fontSize: 16)),
                         ],
                       ),
                     ),
@@ -79,7 +81,7 @@ class _SelectYourTrainState extends State<SelectYourTrain> {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Text(
-              'Cairo: 23 train/day',
+              '${widget.currentStation}: 23 train/day',
               style: TextStyle(fontSize: 16, color: Colors.black54),
             ),
           ),
@@ -117,7 +119,7 @@ class _SelectYourTrainState extends State<SelectYourTrain> {
                               context,
                               MaterialPageRoute(
                                 builder: (context) =>
-                                    TrainDetailsPage(trainId: train.id),
+                                    TrainDetailsPage(train: train),
                               ),
                             );
                           },
@@ -136,9 +138,9 @@ class _SelectYourTrainState extends State<SelectYourTrain> {
 }
 
 class TrainDetailsPage extends StatelessWidget {
-  final String trainId;
+  final QueryDocumentSnapshot<Object?> train;
 
-  TrainDetailsPage({required this.trainId});
+  TrainDetailsPage({required this.train});
 
   @override
   Widget build(BuildContext context) {
@@ -147,104 +149,90 @@ class TrainDetailsPage extends StatelessWidget {
         title: Text('Train Details'),
         backgroundColor: Color(0xFFFF0000),
       ),
-      body: FutureBuilder(
-        future:
-            FirebaseFirestore.instance.collection('Trains').doc(trainId).get(),
-        builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-          if (!snapshot.hasData) {
-            return Center(child: CircularProgressIndicator());
-          }
-          var train = snapshot.data!;
-          return Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Train Number: ${train['Train number']}',
-                    style:
-                        TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                SizedBox(height: 10),
-
-                Text('Train Direction : ${train['Direction']}',
-                    style: TextStyle(fontSize: 16)),
-                SizedBox(height: 10),
-
-                Text('Current Station : ${train['Current station']}',
-                    style: TextStyle(fontSize: 16)),
-                SizedBox(height: 10),
-                Text('Arrival Station : ${train['Arrival station']}',
-                    style: TextStyle(fontSize: 16)),
-                SizedBox(height: 10),
-                Text('Starting Station : ${train['Starting station']}',
-                    style: TextStyle(fontSize: 16)),
-                SizedBox(height: 10),
-                Text('Number of Stations : ${train['Number of stations']}',
-                    style: TextStyle(fontSize: 16)),
-                SizedBox(height: 10),
-                Text(
-                    'Number of Stops between Cairo & Zagazig : ${train['Number of stops']}',
-                    style: TextStyle(fontSize: 15)),
-                SizedBox(height: 10),
-                Text('Trip Duration : ${train['Trip duration']}',
-                    style: TextStyle(fontSize: 16)),
-                SizedBox(height: 10),
-                Text('Ticket Price : ${train['Ticket price']}',
-                    style: TextStyle(fontSize: 16)),
-                SizedBox(height: 10),
-                Text('Train Type : ${train['Type']}',
-                    style: TextStyle(fontSize: 16)),
-                SizedBox(height: 10),
-                Text(
-                    'Arrival Time To Station: ${train['Arrival time to the station']}',
-                    style: TextStyle(fontSize: 16)),
-                SizedBox(height: 10),
-                Text(
-                    'Arrival Time To Destination Station: ${train['Arrival time to the destination station']}',
-                    style: TextStyle(fontSize: 15)),
-                SizedBox(height: 10),
-                Text('Track Number: ${train['Track number']}',
-                    style: TextStyle(fontSize: 16)),
-                // Add more details as needed
-                SizedBox(height: 20),
-                Center(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => SelectSeat(
-                            arrivalStation: train['Arrival station'],
-                            currentStation: train['Current station'],
-                            ticketPrice: train['Ticket price']
-                                .toString(), // Convert to string
-                            numberOfStops: train['Number of stops']
-                                .toString(), // Convert to string
-                            tripDuration: train['Trip duration'],
-                            trainType: train['Type'],
-                            arrivalTimeToStation:
-                                train['Arrival time to the station'],
-                            arrivalTimeToDestinationStation: train[
-                                'Arrival time to the destination station'],
-                          ),
-                        ),
-                      );
-                    },
-                    child: Text('Select Seat'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(
-                          0xFFFF0000), // Use backgroundColor instead of primary
-                      foregroundColor: Colors
-                          .white, // Use foregroundColor instead of onPrimary
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 50, vertical: 15),
-                      textStyle: TextStyle(fontSize: 18),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Train Number: ${train['Train number']}',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+            SizedBox(height: 10),
+            Text('Train Direction : ${train['Direction']}',
+                style: TextStyle(fontSize: 16)),
+            SizedBox(height: 10),
+            Text('Current Station : ${train['Current station']}',
+                style: TextStyle(fontSize: 16)),
+            SizedBox(height: 10),
+            Text('Arrival Station : ${train['Arrival station']}',
+                style: TextStyle(fontSize: 16)),
+            SizedBox(height: 10),
+            Text('Starting Station : ${train['Starting station']}',
+                style: TextStyle(fontSize: 16)),
+            SizedBox(height: 10),
+            Text('Number of Stations : ${train['Number of stations']}',
+                style: TextStyle(fontSize: 16)),
+            SizedBox(height: 10),
+            Text(
+                'Number of Stops between ${train['Current station']} & ${train['Arrival station']} : ${train['Number of stops']}',
+                style: TextStyle(fontSize: 15)),
+            SizedBox(height: 10),
+            Text('Trip Duration : ${train['Trip duration']}',
+                style: TextStyle(fontSize: 16)),
+            SizedBox(height: 10),
+            Text('Ticket Price : ${train['Ticket price']}',
+                style: TextStyle(fontSize: 16)),
+            SizedBox(height: 10),
+            Text('Train Type : ${train['Type']}',
+                style: TextStyle(fontSize: 16)),
+            SizedBox(height: 10),
+            Text(
+                'Arrival Time To Station: ${train['Arrival time to the station']}',
+                style: TextStyle(fontSize: 16)),
+            SizedBox(height: 10),
+            Text(
+                'Arrival Time To Destination Station: ${train['Arrival time to the destination station']}',
+                style: TextStyle(fontSize: 15)),
+            SizedBox(height: 10),
+            Text('Track Number: ${train['Track number']}',
+                style: TextStyle(fontSize: 16)),
+            SizedBox(height: 20),
+            Center(
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => SelectSeat(
+                        arrivalStation: train['Arrival station'],
+                        currentStation: train['Current station'],
+                        ticketPrice: train['Ticket price']
+                            .toString(), // Convert to string
+                        numberOfStops: train['Number of stops']
+                            .toString(), // Convert to string
+                        tripDuration: train['Trip duration'],
+                        trainType: train['Type'],
+                        arrivalTimeToStation:
+                            train['Arrival time to the station'],
+                        arrivalTimeToDestinationStation:
+                            train['Arrival time to the destination station'],
+                        trainNumber: train['Train number'].toString(),
+                      ),
                     ),
-                  ),
+                  );
+                },
+                child: Text('Select Seat'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Color(
+                      0xFFFF0000), // Use backgroundColor instead of primary
+                  foregroundColor:
+                      Colors.white, // Use foregroundColor instead of onPrimary
+                  padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+                  textStyle: TextStyle(fontSize: 18),
                 ),
-              ],
+              ),
             ),
-          );
-        },
+          ],
+        ),
       ),
     );
   }

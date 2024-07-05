@@ -1,353 +1,144 @@
 import 'package:flutter/material.dart';
-import 'dart:ui';
-import 'package:flutter_svg/flutter_svg.dart';
-
-import 'package:google_fonts/google_fonts.dart';
+import 'package:qr_flutter/qr_flutter.dart';
+import 'package:rail_ease/pages/basic_page%20.dart';
+import 'package:rail_ease/services/firestore_service.dart';
+import 'package:rail_ease/services/paymob/ticketdata/ticket_data.dart';
 
 class MyTicket extends StatelessWidget {
+  final String trainNumber;
+  final int totalPrice;
+  final String date;
+
+  MyTicket({
+    required this.trainNumber,
+    required this.totalPrice,
+    required this.date,
+  });
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Color(0xFFFFFFFF),
-        borderRadius: BorderRadius.circular(35),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Ticket Details'),
       ),
-      child: Stack(
-        children: [
-          Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(46),
-              gradient: LinearGradient(
-                begin: Alignment(0, -1.156),
-                end: Alignment(0, 1),
-                colors: <Color>[
-                  Color(0xFFDB2C2C),
-                  Color(0xFFFD1414),
-                  Color(0x00E05F5F)
-                ],
-                stops: <double>[0, 0, 0.826],
-              ),
-            ),
-            child: Container(
-              width: 431,
-              height: 333,
-            ),
-          ),
-          Positioned(
-            right: 2,
-            bottom: -11,
-            child: SizedBox(
-              width: 386,
-              height: 666,
-              child: SvgPicture.asset(
-                'assets/vectors/container_2_x2.svg',
-              ),
-            ),
-          ),
-          Positioned(
-            left: 77,
-            bottom: 235,
-            child: SizedBox(
-              height: 18,
-              child: Text(
-                '4:30',
-                style: GoogleFonts.getFont(
-                  'Inika',
-                  fontWeight: FontWeight.w700,
-                  fontSize: 14,
-                  color: Color(0xFF000000),
-                ),
-              ),
-            ),
-          ),
-          Positioned(
-            right: 60.1,
-            bottom: 235,
-            child: SizedBox(
-              height: 18,
-              child: Text(
-                '6:50',
-                style: GoogleFonts.getFont(
-                  'Inika',
-                  fontWeight: FontWeight.w700,
-                  fontSize: 14,
-                  color: Color(0xFF000000),
-                ),
-              ),
-            ),
-          ),
-          Positioned(
-            left: 75,
-            bottom: 161,
-            child: SizedBox(
-              height: 18,
-              child: Text(
-                '1 June 2023  ',
-                style: GoogleFonts.getFont(
-                  'Inika',
-                  fontWeight: FontWeight.w400,
-                  fontSize: 14,
-                  color: Color(0xFF000000),
-                ),
-              ),
-            ),
-          ),
-          Positioned(
-            left: 111,
-            bottom: 196,
-            child: SizedBox(
-              height: 18,
-              child: Text(
-                'User Name',
-                style: GoogleFonts.getFont(
-                  'Inika',
-                  fontWeight: FontWeight.w400,
-                  fontSize: 14,
-                  color: Color(0xFF000000),
-                ),
-              ),
-            ),
-          ),
-          Positioned(
-            right: 63.6,
-            bottom: 161,
-            child: SizedBox(
-              height: 18,
-              child: Text(
-                '4:30 Pm',
-                style: GoogleFonts.getFont(
-                  'Inika',
-                  fontWeight: FontWeight.w400,
-                  fontSize: 14,
-                  color: Color(0xFF000000),
-                ),
-              ),
-            ),
-          ),
-          Positioned(
-            left: 75,
-            bottom: 126,
-            child: SizedBox(
-              height: 18,
-              child: Text(
-                '8D',
-                style: GoogleFonts.getFont(
-                  'Inika',
-                  fontWeight: FontWeight.w400,
-                  fontSize: 14,
-                  color: Color(0xFF000000),
-                ),
-              ),
-            ),
-          ),
-          Positioned(
-            left: 116.5,
-            top: 306.6,
-            child: Container(
-              decoration: BoxDecoration(
-                color: Color(0xFF000000),
-              ),
-              child: Container(
-                width: 29.1,
-                height: 27,
-              ),
-            ),
-          ),
-          Positioned(
-            left: 93.6,
-            top: 280.6,
-            child: SizedBox(
-              width: 74.9,
-              height: 182.9,
-              child: SvgPicture.asset(
-                'assets/vectors/container_4_x2.svg',
-              ),
-            ),
-          ),
-          Positioned(
-            left: 24,
-            bottom: 264,
-            child: SizedBox(
-              height: 44,
-              child: Text(
-                'Cairo',
-                style: GoogleFonts.getFont(
-                  'Inika',
-                  fontWeight: FontWeight.w700,
-                  fontSize: 34,
-                  color: Color(0xFFA52626),
-                ),
-              ),
-            ),
-          ),
-          Positioned(
-            left: 148.8,
-            bottom: 265.8,
-            child: Container(
-              width: 52,
-              height: 24.9,
-              child: SizedBox(
-                width: 52,
-                height: 24.9,
-                child: SvgPicture.asset(
-                  'assets/vectors/vector_282_x2.svg',
-                ),
-              ),
-            ),
-          ),
-          Positioned(
-            right: 52.1,
-            bottom: 264,
-            child: SizedBox(
-              height: 44,
-              child: Text(
-                'Zagzig',
-                style: GoogleFonts.getFont(
-                  'Inika',
-                  fontWeight: FontWeight.w700,
-                  fontSize: 34,
-                  color: Color(0xFFAA0404),
-                ),
-              ),
-            ),
-          ),
-          Positioned(
-            left: 27,
-            bottom: 161,
-            child: SizedBox(
-              height: 18,
-              child: Text(
-                'Date :',
-                style: GoogleFonts.getFont(
-                  'Inika',
-                  fontWeight: FontWeight.w400,
-                  fontSize: 14,
-                  color: Color(0xFF726658),
-                ),
-              ),
-            ),
-          ),
-          Positioned(
-            left: 27,
-            bottom: 196,
-            child: SizedBox(
-              height: 18,
-              child: Text(
-                'Passenger :',
-                style: GoogleFonts.getFont(
-                  'Inika',
-                  fontWeight: FontWeight.w400,
-                  fontSize: 14,
-                  color: Color(0xFF726658),
-                ),
-              ),
-            ),
-          ),
-          Positioned(
-            right: 122.9,
-            bottom: 161,
-            child: SizedBox(
-              height: 18,
-              child: Text(
-                'Time :',
-                style: GoogleFonts.getFont(
-                  'Inika',
-                  fontWeight: FontWeight.w400,
-                  fontSize: 14,
-                  color: Color(0xFF726658),
-                ),
-              ),
-            ),
-          ),
-          Positioned(
-            left: 27,
-            bottom: 126,
-            child: SizedBox(
-              height: 18,
-              child: Text(
-                'Seat :',
-                style: GoogleFonts.getFont(
-                  'Inika',
-                  fontWeight: FontWeight.w400,
-                  fontSize: 14,
-                  color: Color(0xFF726658),
-                ),
-              ),
-            ),
-          ),
-          Positioned(
-            left: 29,
-            bottom: 235,
-            child: SizedBox(
-              height: 18,
-              child: Text(
-                'go at :',
-                style: GoogleFonts.getFont(
-                  'Inika',
-                  fontWeight: FontWeight.w400,
-                  fontSize: 14,
-                  color: Color(0xFFC2B59B),
-                ),
-              ),
-            ),
-          ),
-          Positioned(
-            right: 95.2,
-            bottom: 235,
-            child: SizedBox(
-              height: 18,
-              child: Text(
-                'arrive :',
-                style: GoogleFonts.getFont(
-                  'Inika',
-                  fontWeight: FontWeight.w400,
-                  fontSize: 14,
-                  color: Color(0xFFC2B59B),
-                ),
-              ),
-            ),
-          ),
-          Positioned(
-            left: 27.2,
-            bottom: 89,
-            child: SizedBox(
-              height: 20,
-              child: RichText(
-                text: TextSpan(
-                  style: GoogleFonts.getFont(
-                    'Roboto Condensed',
-                    fontWeight: FontWeight.w400,
-                    fontSize: 15,
-                    height: 1.2,
-                    color: Color(0x99050505),
+      body: FutureBuilder<TicketData?>(
+        future: FirestoreService().getTicketData(trainNumber),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (!snapshot.hasData || snapshot.data == null) {
+            return Center(child: Text('No ticket found.'));
+          }
+
+          TicketData ticket = snapshot.data!;
+
+          // Save the ticket to the subcollection
+          saveTicket(ticket.copyWith(
+            ticketPrice: totalPrice,
+            date: date,
+          ));
+
+          return SingleChildScrollView(
+            padding: EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  '${ticket.currentStation} -> ${ticket.arrivalStation}',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 24,
+                    color: Colors.red,
                   ),
-                  children: [
-                    TextSpan(
-                      text: 'Total Price :',
-                      style: GoogleFonts.getFont(
-                        'Inika',
-                        fontWeight: FontWeight.w400,
-                        fontSize: 15,
-                        height: 1.3,
-                      ),
-                    ),
-                    TextSpan(
-                      text: '112 LE',
-                      style: GoogleFonts.getFont(
-                        'Inika',
-                        fontWeight: FontWeight.w400,
-                        fontSize: 15,
-                        height: 1.3,
-                        color: Color(0xF2050505),
-                      ),
-                    ),
-                  ],
                 ),
-              ),
+                SizedBox(height: 10),
+                Text(
+                  'Train Number: ${ticket.trainNumber}',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 10),
+                Text(
+                  'Current Station: ${ticket.currentStation}',
+                  style: TextStyle(fontSize: 16),
+                ),
+                SizedBox(height: 10),
+                Text(
+                  'Arrival Station: ${ticket.arrivalStation}',
+                  style: TextStyle(fontSize: 16),
+                ),
+                SizedBox(height: 10),
+                Text(
+                  'Ticket Price: $totalPrice EGP',
+                  style: TextStyle(fontSize: 16),
+                ),
+                SizedBox(height: 10),
+                Text(
+                  'Trip Duration: ${ticket.tripDuration}',
+                  style: TextStyle(fontSize: 16),
+                ),
+                SizedBox(height: 10),
+                Text(
+                  'Arrival Time to Station: ${ticket.arrivalTimeToStation}',
+                  style: TextStyle(fontSize: 16),
+                ),
+                SizedBox(height: 10),
+                Text(
+                  'Arrival Time to Destination Station: ${ticket.arrivalTimeToDestinationStation}',
+                  style: TextStyle(fontSize: 16),
+                ),
+                SizedBox(height: 10),
+                Text(
+                  'Train Type: ${ticket.type}',
+                  style: TextStyle(fontSize: 16),
+                ),
+                SizedBox(height: 20),
+                Container(
+                  padding: EdgeInsets.all(10),
+                  color: Colors.white,
+                  child: Column(
+                    children: [
+                      QrImageView(
+                        data: _generateQrData(ticket),
+                        version: QrVersions.auto,
+                        size: 200.0,
+                      ),
+                      SizedBox(height: 10),
+                      Text(
+                        'Scan QR code for details',
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () async {
+                    await saveTicket(ticket.copyWith(
+                      ticketPrice: totalPrice,
+                      date: date,
+                    ));
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => BasicPage()),
+                    );
+                  },
+                  child: Text('Back Home'),
+                ),
+              ],
             ),
-          ),
-        ],
+          );
+        },
       ),
     );
+  }
+
+  String _generateQrData(TicketData ticket) {
+    return '${ticket.trainNumber},${ticket.currentStation},${ticket.arrivalStation}';
+  }
+
+  Future<void> saveTicket(TicketData ticket) async {
+    await FirestoreService().saveTicketToSubcollection(ticket);
   }
 }

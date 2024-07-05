@@ -29,6 +29,9 @@
     <key>UIMainStoryboardFile</key>
     <string>Main</string>
     <key>UISupportedInterfaceOrientations</key>
+    <key>GOOGLE_MAPS_API_KEY</key>
+    <string>AIzaSyAEc7l33MJIjB8lARNrU-3_BqAUgOEgemE</string>
+
     <array>
         <string>UIInterfaceOrientationPortrait</string>
         <string>UIInterfaceOrientationLandscapeLeft</string>

@@ -11,6 +11,7 @@ class SelectSeat extends StatefulWidget {
   final String trainType;
   final String arrivalTimeToStation;
   final String arrivalTimeToDestinationStation;
+  final String trainNumber;
 
   SelectSeat({
     required this.arrivalStation,
@@ -21,6 +22,7 @@ class SelectSeat extends StatefulWidget {
     required this.trainType,
     required this.arrivalTimeToStation,
     required this.arrivalTimeToDestinationStation,
+    required this.trainNumber,
   });
 
   @override
@@ -28,17 +30,11 @@ class SelectSeat extends StatefulWidget {
 }
 
 class _SelectSeatState extends State<SelectSeat> {
-  // Track seat selection
+  int selectedRailcarId = 1; // Default value for dropdown
+
   List<List<bool>> seatSelected =
-      List.generate(4, (_) => List.generate(5, (_) => false));
+      List.generate(16, (_) => List.generate(4, (_) => false));
 
-  // PageController for PageView
-  final PageController _pageController = PageController();
-
-  // Price per seat
-  final int pricePerSeat = 15;
-
-  // Calculate the total price based on the number of selected seats
   int calculateTotalPrice() {
     int totalSelectedSeats = 0;
     for (var row in seatSelected) {
@@ -48,12 +44,12 @@ class _SelectSeatState extends State<SelectSeat> {
         }
       }
     }
-    return totalSelectedSeats * pricePerSeat;
+    return totalSelectedSeats * int.parse(widget.ticketPrice);
   }
 
   @override
   Widget build(BuildContext context) {
-    int totalPrice = calculateTotalPrice(); // Calculate total price
+    int totalPrice = calculateTotalPrice();
 
     return Scaffold(
       backgroundColor: Color(0xFFE3E3E3),
@@ -66,14 +62,32 @@ class _SelectSeatState extends State<SelectSeat> {
             Navigator.pop(context);
           },
         ),
-        title: Text(
-          'Select seat',
-          style: GoogleFonts.getFont(
-            'Inika',
-            fontWeight: FontWeight.w400,
-            fontSize: 30,
-            color: Color(0xFFFF0000),
-          ),
+        title: Row(
+          children: [
+            Image.asset(
+              'assets/images/trainCar.png', // Replace with your railcar icon path
+              width: 40,
+              height: 40,
+            ),
+            SizedBox(width: 10),
+            DropdownButton<int>(
+              value: selectedRailcarId, // Display currently selected railcar
+              items: [1, 2, 3, 4, 5, 6].map((int value) {
+                return DropdownMenuItem<int>(
+                  value: value,
+                  child: Text('Railcar $value'),
+                );
+              }).toList(),
+              onChanged: (int? newValue) {
+                if (newValue != null) {
+                  setState(() {
+                    selectedRailcarId = newValue;
+                    // Perform actions based on the selected railcar ID if needed
+                  });
+                }
+              },
+            ),
+          ],
         ),
       ),
       body: SingleChildScrollView(
@@ -82,47 +96,7 @@ class _SelectSeatState extends State<SelectSeat> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Display the train details
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(widget.currentStation,
-                          style: TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.bold)),
-                      Text(widget.arrivalTimeToStation,
-                          style: TextStyle(fontSize: 16, color: Colors.red)),
-                    ],
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Text(widget.arrivalStation,
-                          style: TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.bold)),
-                      Text(widget.arrivalTimeToDestinationStation,
-                          style: TextStyle(fontSize: 16, color: Colors.red)),
-                    ],
-                  ),
-                ],
-              ),
-              SizedBox(height: 10),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(widget.tripDuration, style: TextStyle(fontSize: 16)),
-                  Text('${widget.numberOfStops} stops',
-                      style: TextStyle(fontSize: 16)),
-                ],
-              ),
-              SizedBox(height: 10),
-              Text('Price: ${widget.ticketPrice}',
-                  style: TextStyle(fontSize: 16, color: Colors.red)),
-              SizedBox(height: 10),
-              Text(widget.trainType,
-                  style: TextStyle(fontSize: 16, color: Colors.red)),
+              _buildTrainDetails(),
               SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -141,47 +115,45 @@ class _SelectSeatState extends State<SelectSeat> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Total Price: $totalPrice', // Display total price
+                    'Total Price: $totalPrice EGP',
                     style: _getTextStyle(Colors.red),
                   ),
-                  GestureDetector(
-                    onTap: () {
+                  ElevatedButton(
+                    onPressed: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) => AddCard(
                             totalPrice: totalPrice,
-                            trainData: {},
-                          ), // Pass totalPrice to AddCard
+                            trainData: {
+                              'arrivalStation': widget.arrivalStation,
+                              'currentStation': widget.currentStation,
+                              'trainNumber': widget.trainNumber,
+                              'numberOfStops': widget.numberOfStops,
+                              'tripDuration': widget.tripDuration,
+                              'type': widget.trainType,
+                              'arrivalTimeToStation':
+                                  widget.arrivalTimeToStation,
+                              'arrivalTimeToDestinationStation':
+                                  widget.arrivalTimeToDestinationStation,
+                            },
+                          ),
                         ),
                       );
                     },
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => AddCard(
-                              totalPrice: totalPrice,
-                              trainData: {},
-                            ), // Pass totalPrice to AddCard
-                          ),
-                        );
-                      },
-                      child: Text(
-                        'Continue',
-                        style: _getTextStyle(Colors.white),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red,
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14),
-                        ),
+                    child: Text(
+                      'Continue',
+                      style: _getTextStyle(Colors.white),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
                       ),
                     ),
-                  )
+                  ),
                 ],
               ),
             ],
@@ -191,19 +163,81 @@ class _SelectSeatState extends State<SelectSeat> {
     );
   }
 
-  Widget _buildSeatIcon(Color color, int column, int index) {
+  Widget _buildTrainDetails() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  widget.currentStation,
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  widget.arrivalTimeToStation,
+                  style: TextStyle(fontSize: 16, color: Colors.red),
+                ),
+              ],
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  'Train Number: ${widget.trainNumber}',
+                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  widget.arrivalStation,
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  widget.arrivalTimeToDestinationStation,
+                  style: TextStyle(fontSize: 16, color: Colors.red),
+                ),
+              ],
+            ),
+          ],
+        ),
+        SizedBox(height: 10),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(widget.tripDuration, style: TextStyle(fontSize: 16)),
+            Text('${widget.numberOfStops} stops',
+                style: TextStyle(fontSize: 16)),
+          ],
+        ),
+        SizedBox(height: 10),
+        Text('Price: ${widget.ticketPrice} EGP',
+            style: TextStyle(fontSize: 16, color: Colors.red)),
+        SizedBox(height: 10),
+        Text(widget.trainType,
+            style: TextStyle(fontSize: 16, color: Colors.red)),
+      ],
+    );
+  }
+
+  Widget _buildSeatIcon(Color color, int row, int index, int seatNumber) {
     return GestureDetector(
       onTap: () {
         setState(() {
-          seatSelected[column][index] =
-              !seatSelected[column][index]; // Toggle selection
+          seatSelected[row][index] = !seatSelected[row][index];
         });
       },
       child: Container(
         width: 50,
         height: 50,
         decoration: BoxDecoration(
-          color: seatSelected[column][index] ? Colors.red : color,
+          color: seatSelected[row][index] ? Colors.red : color,
           borderRadius: BorderRadius.circular(10),
           boxShadow: [
             BoxShadow(
@@ -212,6 +246,15 @@ class _SelectSeatState extends State<SelectSeat> {
               blurRadius: 3,
             ),
           ],
+        ),
+        child: Center(
+          child: Text(
+            '$seatNumber',
+            style: TextStyle(
+              color: seatSelected[row][index] ? Colors.white : Colors.black,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
         ),
       ),
     );
@@ -249,76 +292,55 @@ class _SelectSeatState extends State<SelectSeat> {
   }
 
   Widget _buildSeatLayout() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        SizedBox(width: 20), // Space on the left
-        Column(
-          children: List.generate(
-            5, // Generate 5 seats per column
-            (index) {
-              return Column(
-                children: [
-                  _buildSeatIcon(Colors.grey, 0, index), // First column
-                  SizedBox(height: 10), // Small space between each seat
-                ],
-              );
-            },
-          ),
-        ),
-        SizedBox(width: 20), // Space between the two pairs of columns
-        Column(
-          children: List.generate(
-            5, // Generate 5 seats per column
-            (index) {
-              return Column(
-                children: [
-                  _buildSeatIcon(Colors.grey, 1, index), // Second column
-                  SizedBox(height: 10), // Small space between each seat
-                ],
-              );
-            },
-          ),
-        ),
-        SizedBox(width: 60), // Space between the two pairs of columns
-        Column(
-          children: List.generate(
-            5, // Generate 5 seats per column
-            (index) {
-              return Column(
-                children: [
-                  _buildSeatIcon(Colors.grey, 2, index), // Third column
-                  SizedBox(height: 10), // Small space between each seat
-                ],
-              );
-            },
-          ),
-        ),
-        SizedBox(width: 20), // Space between the two pairs of columns
-        Column(
-          children: List.generate(
-            5, // Generate 5 seats per column
-            (index) {
-              return Column(
-                children: [
-                  _buildSeatIcon(Colors.grey, 3, index), // Fourth column
-                  SizedBox(height: 10), // Small space between each seat
-                ],
-              );
-            },
-          ),
-        ),
-        SizedBox(width: 20), // Space on the right
-      ],
+    int seatNumber = 1;
+    return Column(
+      children: List.generate(
+        16, // Generate 16 rows
+        (row) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Row(
+                  children: List.generate(
+                    2, // 2 seats on the left side
+                    (index) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                        child: _buildSeatIcon(
+                            Colors.grey, row, index, seatNumber++),
+                      );
+                    },
+                  ),
+                ),
+                SizedBox(
+                    width: 20), // Adjust space between left and right seats
+                Row(
+                  children: List.generate(
+                    2, // 2 seats on the right side
+                    (index) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                        child: _buildSeatIcon(
+                            Colors.grey, row, index + 2, seatNumber++),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
     );
   }
 
   TextStyle _getTextStyle(Color color) {
-    return GoogleFonts.getFont(
-      'Inika',
-      fontWeight: FontWeight.w400,
-      fontSize: 16,
+    return GoogleFonts.inter(
       color: color,
+      fontSize: 16,
+      fontWeight: FontWeight.bold,
     );
   }
 }

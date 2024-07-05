@@ -1,164 +1,149 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:rail_ease/services/paymob/paymob_manager.dart';
+import 'package:rail_ease/pages/my_ticket.dart';
+import 'package:rail_ease/services/firestore_service.dart';
+import 'package:rail_ease/services/paymob/ticketdata/ticket_data.dart';
 
 class AddCard extends StatefulWidget {
   final int totalPrice;
   final Map<String, dynamic> trainData;
 
-  AddCard({required this.totalPrice, required this.trainData});
+  AddCard({
+    required this.totalPrice,
+    required this.trainData,
+  });
 
   @override
   _AddCardState createState() => _AddCardState();
 }
 
 class _AddCardState extends State<AddCard> {
-  final PaymobManager paymobManager = PaymobManager();
   final _formKey = GlobalKey<FormState>();
+  final TextEditingController _cardHolderNameController =
+      TextEditingController();
+  final TextEditingController _cardNumberController = TextEditingController();
+  final TextEditingController _expiryDateController = TextEditingController();
+  final TextEditingController _cvcController = TextEditingController();
 
-  String cardHolderName = '';
-  String cardNumber = '';
-  String expiryDate = '';
-  String cvc = '';
-  bool isLoading = false;
+  @override
+  void dispose() {
+    _cardHolderNameController.dispose();
+    _cardNumberController.dispose();
+    _expiryDateController.dispose();
+    _cvcController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: WillPopScope(
-        onWillPop: () async {
-          Navigator.of(context).pop();
-          return true;
-        },
-        child: SingleChildScrollView(
-          child: Container(
-            decoration: BoxDecoration(
-              color: Color(0xFFFFFFFF),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            padding: EdgeInsets.fromLTRB(23, 42, 24, 259),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+      appBar: AppBar(
+        title: Text('Add Card'),
+        backgroundColor: Color.fromARGB(255, 238, 54, 54),
+      ),
+      body: SingleChildScrollView(
+        padding: EdgeInsets.all(20),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(height: 20),
+              Text(
+                'Total Price: ${widget.totalPrice} EGP',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 20),
+              _buildTrainInfo('Train Number', 'trainNumber'),
+              SizedBox(height: 15),
+              _buildTrainInfo('Arrival Station', 'arrivalStation'),
+              SizedBox(height: 15),
+              _buildTrainInfo('Current Station', 'currentStation'),
+              SizedBox(height: 40),
+              _buildInputField(
+                'CARD HOLDER NAME',
+                'Enter card holder name',
+                _cardHolderNameController,
+              ),
+              SizedBox(height: 20),
+              _buildInputField(
+                'CARD NUMBER',
+                'Enter card number',
+                _cardNumberController,
+                maxLength: 19,
+                format: _CardNumberFormatter(),
+              ),
+              SizedBox(height: 20),
+              _buildExpiryAndCVC(),
+              SizedBox(height: 30),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  _buildTitle(context),
-                  SizedBox(height: 46),
-                  _buildInputField(
-                    'CARD HOLDER NAME',
-                    'Enter card holder name',
-                    maxLength: null,
-                    format: null,
-                    onChanged: (value) {
-                      cardHolderName = value;
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context); // Navigate back to previous page
                     },
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter card holder name';
-                      }
-                      return null;
-                    },
-                  ),
-                  _buildInputField(
-                    'CARD NUMBER',
-                    'Enter card number',
-                    maxLength: 19,
-                    format: _CardNumberFormatter(),
-                    onChanged: (value) {
-                      cardNumber = value;
-                    },
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter card number';
-                      } else if (value.length < 19) {
-                        return 'Please enter a valid card number';
-                      }
-                      return null;
-                    },
-                  ),
-                  _buildExpiryAndCVC(),
-                  SizedBox(height: 48),
-                  _buildButtons(),
-                  if (isLoading)
-                    Center(
-                      child: CircularProgressIndicator(),
+                    child: Text('Cancel'),
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all<Color>(
+                          Colors.red), // Set button background color
                     ),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      if (_formKey.currentState!.validate()) {
+                        _simulatePaymentSuccess(context);
+                      }
+                    },
+                    child: Text('Pay Now'),
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all<Color>(
+                          Colors.red), // Set button background color
+                    ),
+                  ),
                 ],
               ),
-            ),
+            ],
           ),
         ),
       ),
     );
   }
 
-  Widget _buildTitle(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        GestureDetector(
-          onTap: () {
-            Navigator.pop(context);
-          },
-          child: SvgPicture.asset('assets/vectors/back_11_x2.svg'),
-        ),
-        Text(
-          'Add Card',
-          style: GoogleFonts.getFont(
-            'Inika',
-            fontWeight: FontWeight.w400,
-            fontSize: 18,
-            color: Color(0xFF0D0D0D),
-          ),
-        ),
-      ],
+  Widget _buildTrainInfo(String label, String key) {
+    final String? value = widget.trainData[key];
+    return Text(
+      '$label: ${value ?? 'Not specified'}',
+      style: TextStyle(fontSize: 16),
     );
   }
 
-  Widget _buildInputField(String label, String hintText,
-      {int? maxLength,
-      TextInputFormatter? format,
-      ValueChanged<String>? onChanged,
-      String? Function(String?)? validator}) {
+  Widget _buildInputField(
+    String label,
+    String hintText,
+    TextEditingController controller, {
+    int? maxLength,
+    TextInputFormatter? format,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: GoogleFonts.getFont(
-            'Inika',
-            fontWeight: FontWeight.w400,
-            fontSize: 14,
-            height: 1.7,
-            color: Color(0xFFA0A5BA),
-          ),
-        ),
-        SizedBox(height: 8),
+        Text(label),
         TextFormField(
-          onChanged: onChanged,
+          controller: controller,
           inputFormatters: format != null ? [format] : null,
           maxLength: maxLength,
-          validator: validator,
           decoration: InputDecoration(
-            counterText: '',
-            filled: true,
-            fillColor: Color(0xFFF0F5FA),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide.none,
-            ),
-            contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 20),
             hintText: hintText,
-            hintStyle: TextStyle(
-              fontFamily: 'Inika',
-              fontWeight: FontWeight.w400,
-              fontSize: 16,
-              color: Color(0xFF32343E),
-            ),
           ),
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Please enter $label';
+            }
+            return null;
+          },
         ),
+        SizedBox(height: 10),
       ],
     );
   }
@@ -167,181 +152,103 @@ class _AddCardState extends State<AddCard> {
     return Row(
       children: [
         Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildInputField(
-                'EXPIRE DATE',
-                'mm/yyyy',
-                maxLength: 7,
-                format: _ExpiryDateFormatter(),
-                onChanged: (value) {
-                  expiryDate = value;
-                },
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter expiry date';
-                  }
-                  return null;
-                },
-              ),
-            ],
+          child: _buildInputField(
+            'EXPIRE DATE',
+            'mm/yyyy',
+            _expiryDateController,
+            maxLength: 7,
+            format: _ExpiryDateFormatter(),
           ),
         ),
-        SizedBox(width: 14),
+        SizedBox(width: 20),
         Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildInputField(
-                'CVC',
-                'Enter CVC',
-                maxLength: 3,
-                format: FilteringTextInputFormatter.digitsOnly,
-                onChanged: (value) {
-                  cvc = value;
-                },
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter CVC';
-                  } else if (value.length < 3) {
-                    return 'Please enter a valid CVC';
-                  }
-                  return null;
-                },
-              ),
-            ],
+          child: _buildInputField(
+            'CVC',
+            'Enter CVC',
+            _cvcController,
+            maxLength: 3,
+            format: FilteringTextInputFormatter.digitsOnly,
           ),
         ),
       ],
     );
   }
 
-  Widget _buildButtons() {
-    return Row(
-      children: [
-        Expanded(
-          child: Container(
-            margin: EdgeInsets.only(right: 23),
-            decoration: BoxDecoration(
-              border: Border.all(color: Color(0xFF121212)),
-              borderRadius: BorderRadius.circular(14),
-              color: Color(0x21FFFFFF),
-            ),
-            child: TextButton(
+  void _simulatePaymentSuccess(BuildContext context) async {
+    final FirestoreService firestoreService = FirestoreService();
+
+    TicketData ticketData = TicketData(
+      trainNumber: widget.trainData['trainNumber'] ?? '',
+      currentStation: widget.trainData['currentStation'] ?? '',
+      arrivalStation: widget.trainData['arrivalStation'] ?? '',
+      ticketPrice: widget.totalPrice,
+      tripDuration: widget.trainData['tripDuration'] ?? '',
+      type: widget.trainData['type'] ?? '',
+      arrivalTimeToStation: widget.trainData['arrivalTimeToStation'] ?? '',
+      arrivalTimeToDestinationStation:
+          widget.trainData['arrivalTimeToDestinationStation'] ?? '',
+      date: widget.trainData['date'] ?? '',
+    );
+
+    await firestoreService.saveTicketToSubcollection(ticketData);
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Payment Successful'),
+          content: Text('Do you want to show your ticket?'),
+          actions: [
+            TextButton(
               onPressed: () {
-                Navigator.pop(context);
+                Navigator.pop(context); // Close the dialog
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => MyTicket(
+                      trainNumber: ticketData.trainNumber,
+                      totalPrice: ticketData.ticketPrice,
+                      date: ticketData.date,
+                    ),
+                  ),
+                );
               },
-              child: Text(
-                'Cancel',
-                style: TextStyle(
-                  fontFamily: 'Inika',
-                  fontWeight: FontWeight.w400,
-                  fontSize: 16,
-                  color: Color(0xFF0D0D0D),
-                ),
-              ),
+              child: Text('OK'),
             ),
-          ),
-        ),
-        Expanded(
-          child: ElevatedButton(
-            onPressed: _processPayment,
-            style: ElevatedButton.styleFrom(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(14),
-              ),
-              backgroundColor: Color(0xFF0D0D0D),
-              padding: EdgeInsets.symmetric(vertical: 15),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // Close the dialog
+                Navigator.pop(
+                    context); // Navigate back to previous page (AddCard page)
+              },
+              child: Text('Cancel'),
             ),
-            child: Text(
-              'Pay',
-              style: TextStyle(
-                fontFamily: 'Inika',
-                fontWeight: FontWeight.w400,
-                fontSize: 16,
-                color: Colors.white,
-              ),
-            ),
-          ),
-        ),
-      ],
+          ],
+        );
+      },
     );
-  }
-
-  Future<void> _processPayment() async {
-    if (_formKey.currentState!.validate()) {
-      setState(() {
-        isLoading = true;
-      });
-
-      try {
-        final token = await paymobManager.postToken();
-        final orderId = await paymobManager.getOrderId(
-          token: token,
-          amount: widget.totalPrice.toDouble(),
-        );
-
-        final billingData = {
-          "first_name": cardHolderName.split(" ").first,
-          "last_name": cardHolderName.split(" ").last,
-          "email": "email@example.com",
-          "phone_number": "+201234567890",
-          "apartment": "NA",
-          "floor": "NA",
-          "street": "NA",
-          "building": "NA",
-          "shipping_method": "NA",
-          "postal_code": "NA",
-          "city": "NA",
-          "country": "NA",
-          "state": "NA"
-        };
-
-        final paymentKey = await paymobManager.requestPaymentKey(
-          authToken: token,
-          orderId: orderId.toString(),
-          amountPounds: widget.totalPrice.toDouble(),
-          billingData: billingData,
-        );
-
-        // Proceed to payment using the payment key
-        // Implement your payment gateway flow here
-
-        setState(() {
-          isLoading = false;
-        });
-
-        // Navigate to a success or confirmation page
-        // Navigator.push(context, MaterialPageRoute(builder: (context) => SuccessPage()));
-      } catch (e) {
-        setState(() {
-          isLoading = false;
-        });
-        // Handle the error
-        // Show an error message
-        print(e.toString());
-      }
-    }
   }
 }
 
 class _CardNumberFormatter extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(
-      TextEditingValue oldValue, TextEditingValue newValue) {
-    var text = newValue.text.replaceAll(' ', '');
-    var buffer = StringBuffer();
-    for (int i = 0; i < text.length; i++) {
-      buffer.write(text[i]);
-      var nonSpaceIndex = i + 1;
-      if (nonSpaceIndex % 4 == 0 && nonSpaceIndex != text.length) {
-        buffer.write(' ');
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    String newText = newValue.text.replaceAll(RegExp(r'\D'), '');
+    String formattedText = '';
+
+    for (int i = 0; i < newText.length; i++) {
+      if (i % 4 == 0 && i != 0) {
+        formattedText += ' ';
       }
+      formattedText += newText[i];
     }
+
     return TextEditingValue(
-      text: buffer.toString(),
-      selection: TextSelection.collapsed(offset: buffer.length),
+      text: formattedText,
+      selection: TextSelection.collapsed(offset: formattedText.length),
     );
   }
 }
@@ -349,35 +256,22 @@ class _CardNumberFormatter extends TextInputFormatter {
 class _ExpiryDateFormatter extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(
-      TextEditingValue oldValue, TextEditingValue newValue) {
-    final newText = newValue.text;
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    String newText = newValue.text.replaceAll(RegExp(r'\D'), '');
+    String formattedText = '';
 
-    if (newText.length < oldValue.text.length) return newValue;
-
-    var result = "";
-
-    if (newText.contains("/")) {
-      final dates = newText.split("/");
-      final month = dates.first;
-      final year = dates.last;
-      if (year.length >= 2) {
-        result = "$month/${year.substring(0, 2)}";
-      } else {
-        result = newText;
+    for (int i = 0; i < newText.length; i++) {
+      if (i == 2) {
+        formattedText += '/';
       }
-    } else {
-      if (newText.length == 2) {
-        result = "$newText/";
-      } else {
-        result = newText;
-      }
+      formattedText += newText[i];
     }
 
-    return newValue.copyWith(
-      text: result,
-      selection: TextSelection.fromPosition(
-        TextPosition(offset: result.length),
-      ),
+    return TextEditingValue(
+      text: formattedText,
+      selection: TextSelection.collapsed(offset: formattedText.length),
     );
   }
 }

@@ -44,7 +44,7 @@ android {
 
     defaultConfig {
         applicationId "com.example.rail_ease"
-        minSdkVersion flutter.minSdkVersion // Modify this line
+        minSdkVersion 21 // Modify this line
         targetSdkVersion 33
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName

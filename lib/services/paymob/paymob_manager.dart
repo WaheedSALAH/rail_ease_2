@@ -2,69 +2,76 @@ import 'package:dio/dio.dart';
 import 'package:rail_ease/services/paymob/constants.dart';
 
 class PaymobManager {
-  Dio dio = Dio();
+  final Dio _dio = Dio();
 
-  Future<String> postToken() async {
+  Future<String> getAuthToken() async {
     try {
-      Response response = await dio.post(
-        'https://accept.paymobsolutions.com/api/auth/tokens',
-        data: {"api_key": Constants.api_key},
-      );
+      Response response =
+          await _dio.post("https://pakistan.paymob.com/api/auth/tokens", data: {
+        'api_key': Constants.api_key,
+      });
       return response.data['token'];
     } catch (e) {
-      rethrow;
+      print("Error occurred while getting auth token: $e");
+      throw e;
     }
   }
 
-  Future<int> getOrderId({
-    required String token,
-    required double amount, // Change amount to double
-  }) async {
+  Future<String> getOrderId(
+      String authToken, int totalPrice, String currency) async {
     try {
-      Response response = await dio.post(
-        'https://accept.paymobsolutions.com/api/ecommerce/orders',
-        options: Options(headers: {'Authorization': 'Bearer $token'}),
+      Response response = await _dio.post(
+        " https://pakistan.paymob.com/api/ecommerce/orders",
         data: {
-          "auth_token": token,
+          "auth_token": authToken,
           "delivery_needed": "false",
-          "amount_cents": (amount * 100)
-              .toInt()
-              .toString(), // Multiply by 100 and convert to int
-          "currency": "EGP",
+          "amount_cents": "$totalPrice",
+          "currency": currency,
           "items": [],
         },
       );
-      return response.data['id'];
+      return response.data['id'].toString();
     } catch (e) {
-      rethrow;
+      print("Error occurred while getting order ID: $e");
+      throw e;
     }
   }
 
-  Future<String> requestPaymentKey({
-    required String authToken,
-    required String orderId,
-    required double amountPounds, // Change amount to double
-    required Map<String, String> billingData,
-  }) async {
+  Future<String> getPaymentKey(int totalPrice, String currency) async {
     try {
-      Response response = await dio.post(
-        'https://accept.paymobsolutions.com/api/acceptance/payment_keys',
-        options: Options(headers: {'Authorization': 'Bearer $authToken'}),
+      String authToken = await getAuthToken();
+      String orderId = await getOrderId(authToken, totalPrice, currency);
+
+      Response response = await _dio.post(
+        " https://pakistan.paymob.com/api/acceptance/payment_keys",
         data: {
-          'auth_token': authToken,
-          'amount_cents': (amountPounds * 100)
-              .toInt()
-              .toString(), // Multiply by 100 and convert to int
-          'expiration': 3600,
-          'order_id': orderId,
-          'billing_data': billingData,
-          'currency': 'EGP',
-          'integration_id': Constants.integration_id,
+          "auth_token": authToken,
+          "amount_cents": "$totalPrice",
+          "expiration": 3600,
+          "order_id": orderId,
+          "billing_data": {
+            "apartment": "NA",
+            "email": "test@example.com",
+            "floor": "NA",
+            "first_name": "NA",
+            "street": "NA",
+            "building": "NA",
+            "phone_number": "0123456789",
+            "shipping_method": "NA",
+            "postal_code": "NA",
+            "city": "NA",
+            "country": "NA",
+            "last_name": "NA",
+            "state": "NA",
+          },
+          "currency": currency,
+          "integration_id": Constants.integration_id,
         },
       );
       return response.data['token'];
     } catch (e) {
-      rethrow;
+      print("Error occurred while getting payment key: $e");
+      throw e;
     }
   }
 }

@@ -1,10 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:rail_ease/pages/menu.dart';
+import 'package:rail_ease/pages/my_ticket.dart';
+import 'package:rail_ease/pages/notifications.dart';
 import 'package:rail_ease/pages/select_your_train.dart';
-
-import 'my_ticket.dart';
-import 'notifications.dart';
 
 void main() {
   runApp(MyApp());
@@ -28,13 +27,50 @@ class BasicPage extends StatefulWidget {
 class _BasicPageState extends State<BasicPage> {
   String? _currentStation;
   String? _arrivalStation;
+  DateTime? _selectedDate;
+
+  List<String> stations = [];
+
+  @override
+  void initState() {
+    super.initState();
+    fetchStations();
+  }
+
+  Future<void> fetchStations() async {
+    try {
+      QuerySnapshot snapshot = await FirebaseFirestore.instance
+          .collection('Stations between Cairo and Zagazig')
+          .get();
+      List<String> stationList = snapshot.docs.map((doc) => doc.id).toList();
+      setState(() {
+        stations = stationList;
+      });
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2101),
+    );
+    if (picked != null) {
+      setState(() {
+        _selectedDate = picked;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Rail Ease'),
-        automaticallyImplyLeading: false, // This line removes the back button
+        automaticallyImplyLeading: false,
         actions: [
           IconButton(
             icon: Icon(Icons.menu),
@@ -60,14 +96,35 @@ class _BasicPageState extends State<BasicPage> {
                   _arrivalStation = arrival;
                 });
               },
+              onSelectDate: _selectDate,
+              selectedDate: _selectedDate,
+              stations: stations,
             ),
             Footer(
               currentStation: _currentStation,
               arrivalStation: _arrivalStation,
+              onPressed: () {
+                if (_currentStation == null || _arrivalStation == null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Please select both stations.'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                } else {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => SelectYourTrain(
+                        currentStation: _currentStation!,
+                        arrivalStation: _arrivalStation!,
+                      ),
+                    ),
+                  );
+                }
+              },
             ),
-            SizedBox(
-              height: 100,
-            ),
+            SizedBox(height: 100),
           ],
         ),
       ),
@@ -86,15 +143,19 @@ class _BasicPageState extends State<BasicPage> {
             ),
             IconButton(
               icon: ImageIcon(
-                AssetImage(
-                    'assets/images/ticket.png'), // Replace 'ticket_icon.png' with your image asset path
-                size: 32, // Adjust the size as needed
-                // color: Colors.red, // Customize the color as needed
+                AssetImage('assets/images/ticket.png'),
+                size: 32,
               ),
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => MyTicket()),
+                  MaterialPageRoute(
+                      builder: (context) => MyTicket(
+                            trainNumber:
+                                '12345', // Replace with actual train number
+                            totalPrice: 100, // Replace with actual total price
+                            date: '01-01-2024', // Replace with actual date
+                          )),
                 );
               },
             ),
@@ -110,10 +171,7 @@ class _BasicPageState extends State<BasicPage> {
             IconButton(
               icon: Icon(Icons.train),
               onPressed: () {
-                // Navigator.push(
-                //   context,
-                //   // MaterialPageRoute(builder: (context) => Location()),
-                // );
+                // Handle train icon navigation
               },
             ),
           ],
@@ -194,53 +252,24 @@ class GradientContainer extends StatelessWidget {
 
 class SearchForm extends StatefulWidget {
   final Function(String?, String?) onStationChanged;
+  final Function(BuildContext) onSelectDate;
+  final DateTime? selectedDate;
+  final List<String> stations;
 
-  const SearchForm({required this.onStationChanged});
+  const SearchForm({
+    required this.onStationChanged,
+    required this.onSelectDate,
+    required this.selectedDate,
+    required this.stations,
+  });
 
   @override
   _SearchFormState createState() => _SearchFormState();
 }
 
 class _SearchFormState extends State<SearchForm> {
-  DateTime? _selectedDate;
   String? _currentStation;
   String? _arrivalStation;
-
-  List<String> stations = [];
-
-  @override
-  void initState() {
-    super.initState();
-    fetchStations();
-  }
-
-  Future<void> fetchStations() async {
-    try {
-      QuerySnapshot snapshot = await FirebaseFirestore.instance
-          .collection('Stations between Cairo and Zagazig')
-          .get();
-      List<String> stationList = snapshot.docs.map((doc) => doc.id).toList();
-      setState(() {
-        stations = stationList;
-      });
-    } catch (e) {
-      print(e);
-    }
-  }
-
-  Future<void> _selectDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2020),
-      lastDate: DateTime(2101),
-    );
-    if (picked != null) {
-      setState(() {
-        _selectedDate = picked;
-      });
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -250,14 +279,14 @@ class _SearchFormState extends State<SearchForm> {
         children: [
           GestureDetector(
             onTap: () {
-              _selectDate(context);
+              widget.onSelectDate(context);
             },
             child: AbsorbPointer(
               child: TextFormField(
                 readOnly: true,
                 decoration: InputDecoration(
-                  labelText: _selectedDate != null
-                      ? 'Departure Date: ${_selectedDate!.day}/${_selectedDate!.month}/${_selectedDate!.year}'
+                  labelText: widget.selectedDate != null
+                      ? 'Departure Date: ${widget.selectedDate!.day}/${widget.selectedDate!.month}/${widget.selectedDate!.year}'
                       : 'Departure Date',
                   hintText: 'Select Date',
                   border: OutlineInputBorder(),
@@ -266,8 +295,7 @@ class _SearchFormState extends State<SearchForm> {
               ),
             ),
           ),
-          SizedBox(height: 20), // Add space between fields
-
+          SizedBox(height: 20),
           DropdownButtonFormField<String>(
             decoration: const InputDecoration(
               labelText: 'Choose Current Station',
@@ -275,7 +303,7 @@ class _SearchFormState extends State<SearchForm> {
               suffixIcon: Icon(Icons.keyboard_arrow_down),
             ),
             value: _currentStation,
-            items: stations.map((station) {
+            items: widget.stations.map((station) {
               return DropdownMenuItem<String>(
                 value: station,
                 child: Text(station),
@@ -288,24 +316,23 @@ class _SearchFormState extends State<SearchForm> {
               });
             },
           ),
-          SizedBox(height: 5), // Add space between fields
-
+          SizedBox(height: 5),
           Stack(
             alignment: Alignment.center,
             children: [
               Image.asset(
                 'assets/images/red circle.png',
-                height: 50, // Adjust height as needed
-                width: 50, // Adjust width as needed
+                height: 50,
+                width: 50,
               ),
               Image.asset(
                 'assets/images/up down arrow.png',
-                height: 24, // Adjust height as needed
-                width: 24, // Adjust width as needed
+                height: 24,
+                width: 24,
               ),
             ],
           ),
-          SizedBox(height: 10), // Add space between fields
+          SizedBox(height: 10),
           DropdownButtonFormField<String>(
             decoration: InputDecoration(
               labelText: 'Choose Arrival Station',
@@ -313,7 +340,7 @@ class _SearchFormState extends State<SearchForm> {
               suffixIcon: Icon(Icons.keyboard_arrow_down),
             ),
             value: _arrivalStation,
-            items: stations.map((station) {
+            items: widget.stations.map((station) {
               return DropdownMenuItem<String>(
                 value: station,
                 child: Text(station),
@@ -335,54 +362,35 @@ class _SearchFormState extends State<SearchForm> {
 class Footer extends StatelessWidget {
   final String? currentStation;
   final String? arrivalStation;
+  final VoidCallback onPressed;
 
-  const Footer({required this.currentStation, required this.arrivalStation});
+  const Footer({
+    required this.currentStation,
+    required this.arrivalStation,
+    required this.onPressed,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        SizedBox(height: 40), // Add a SizedBox above the button
-        Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: () {
-              if (currentStation == null || arrivalStation == null) {
-                // Show an error message
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Please select both stations.'),
-                    backgroundColor: Colors.red,
-                  ),
-                );
-              } else {
-                // Navigate to SelectYourTrain page
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => SelectYourTrain(),
-                  ),
-                );
-              }
-            },
-            child: Container(
-              width: 284,
-              height: 50,
-              decoration: BoxDecoration(
-                color: Color(0xFFFF0000),
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child: const Center(
-                child: Text(
-                  'Search train',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontFamily: 'Inika',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
+        SizedBox(height: 50),
+        ElevatedButton(
+          onPressed: onPressed,
+          child: Text(
+            'Find Your Train',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+              fontFamily: 'Inika',
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Color(0xFFFF0000),
+            padding: EdgeInsets.symmetric(horizontal: 40, vertical: 16),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
             ),
           ),
         ),
