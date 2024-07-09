@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:rail_ease/pages/add_card.dart';
@@ -31,9 +32,88 @@ class SelectSeat extends StatefulWidget {
 
 class _SelectSeatState extends State<SelectSeat> {
   int selectedRailcarId = 1; // Default value for dropdown
+  late List<List<bool>> seatSelected;
+  late List<List<bool>> seatUnavailable;
+  late FirebaseFirestore firestore;
+  late CollectionReference trainsCollection;
 
-  List<List<bool>> seatSelected =
-      List.generate(16, (_) => List.generate(4, (_) => false));
+  @override
+  void initState() {
+    super.initState();
+    // Initialize Firestore
+    firestore = FirebaseFirestore.instance;
+    trainsCollection = firestore.collection('Trains');
+    // Initialize seatSelected and seatUnavailable in initState
+    seatSelected =
+        List.generate(16, (row) => List.generate(4, (index) => false));
+    seatUnavailable =
+        List.generate(16, (row) => List.generate(4, (index) => false));
+    fetchSelectedSeats();
+  }
+
+  void fetchSelectedSeats() async {
+    try {
+      QuerySnapshot snapshot = await trainsCollection
+          .doc(widget.trainNumber)
+          .collection('railcar')
+          .doc(selectedRailcarId.toString())
+          .collection('seats')
+          .get();
+
+      for (var doc in snapshot.docs) {
+        int seatNumber = int.parse(doc.id);
+        bool isSelected = doc['selected'];
+        if (isSelected) {
+          int row = (seatNumber - 1) ~/ 4;
+          int col = (seatNumber - 1) % 4;
+          seatUnavailable[row][col] = true;
+          seatSelected[row][col] = true; // Mark seat as selected
+        }
+      }
+      setState(() {});
+    } catch (e) {
+      print("Error fetching selected seats: $e");
+    }
+  }
+
+  void saveSelectedSeats() async {
+    try {
+      WriteBatch batch = firestore.batch();
+      int seatNumber = 1;
+
+      for (int row = 0; row < seatSelected.length; row++) {
+        for (int index = 0; index < seatSelected[row].length; index++) {
+          // Prepare data for Firestore
+          Map<String, dynamic> seatData = {
+            'seatNumber': seatNumber,
+            'selected': seatSelected[row][index],
+          };
+          // Update Firestore batch
+          batch.set(
+            trainsCollection
+                .doc(widget.trainNumber)
+                .collection('railcar')
+                .doc(selectedRailcarId.toString())
+                .collection('seats')
+                .doc(seatNumber.toString()),
+            seatData,
+          );
+          seatNumber++;
+        }
+      }
+      // Commit the batch
+      await batch.commit();
+      print("Seats saved successfully");
+
+      // Clear selected seats after saving
+      setState(() {
+        seatSelected =
+            List.generate(16, (row) => List.generate(4, (index) => false));
+      });
+    } catch (e) {
+      print("Error saving seats: $e");
+    }
+  }
 
   int calculateTotalPrice() {
     int totalSelectedSeats = 0;
@@ -82,7 +162,7 @@ class _SelectSeatState extends State<SelectSeat> {
                 if (newValue != null) {
                   setState(() {
                     selectedRailcarId = newValue;
-                    // Perform actions based on the selected railcar ID if needed
+                    fetchSelectedSeats(); // Fetch seats for the newly selected railcar
                   });
                 }
               },
@@ -103,7 +183,7 @@ class _SelectSeatState extends State<SelectSeat> {
                 children: [
                   _buildSeatIconWithText(Colors.grey, 'Available'),
                   _buildSeatIconWithText(Colors.red, 'Selected'),
-                  _buildSeatIconWithText(Colors.black, 'Filled'),
+                  _buildSeatIconWithText(Colors.black, 'Unavailable'),
                 ],
               ),
               SizedBox(height: 10),
@@ -119,7 +199,20 @@ class _SelectSeatState extends State<SelectSeat> {
                     style: _getTextStyle(Colors.red),
                   ),
                   ElevatedButton(
-                    onPressed: () {
+                    onPressed: () async {
+                      saveSelectedSeats();
+                      // Create a list of selected seats
+                      List<int> selectedSeats = [];
+                      for (int row = 0; row < seatSelected.length; row++) {
+                        for (int index = 0;
+                            index < seatSelected[row].length;
+                            index++) {
+                          if (seatSelected[row][index]) {
+                            selectedSeats.add((row * 4) + index + 1);
+                          }
+                        }
+                      }
+                      // Navigate to AddCard page with ticket data and selected seats
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -137,6 +230,7 @@ class _SelectSeatState extends State<SelectSeat> {
                               'arrivalTimeToDestinationStation':
                                   widget.arrivalTimeToDestinationStation,
                             },
+                            selectedSeats: selectedSeats,
                           ),
                         ),
                       );
@@ -208,139 +302,113 @@ class _SelectSeatState extends State<SelectSeat> {
           ],
         ),
         SizedBox(height: 10),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(widget.tripDuration, style: TextStyle(fontSize: 16)),
-            Text('${widget.numberOfStops} stops',
-                style: TextStyle(fontSize: 16)),
-          ],
+        Divider(color: Colors.black),
+        SizedBox(height: 10),
+        Text(
+          'Direction: ${widget.currentStation} - ${widget.arrivalStation}',
+          style: TextStyle(fontSize: 14),
         ),
-        SizedBox(height: 10),
-        Text('Price: ${widget.ticketPrice} EGP',
-            style: TextStyle(fontSize: 16, color: Colors.red)),
-        SizedBox(height: 10),
-        Text(widget.trainType,
-            style: TextStyle(fontSize: 16, color: Colors.red)),
+        Text(
+          'Trip Duration: ${widget.tripDuration}',
+          style: TextStyle(fontSize: 14),
+        ),
+        Text(
+          'Train Type: ${widget.trainType}',
+          style: TextStyle(fontSize: 14),
+        ),
+        Text(
+          'Number of Stops: ${widget.numberOfStops}',
+          style: TextStyle(fontSize: 14),
+        ),
       ],
     );
   }
 
-  Widget _buildSeatIcon(Color color, int row, int index, int seatNumber) {
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          seatSelected[row][index] = !seatSelected[row][index];
-        });
-      },
-      child: Container(
-        width: 50,
-        height: 50,
-        decoration: BoxDecoration(
-          color: seatSelected[row][index] ? Colors.red : color,
-          borderRadius: BorderRadius.circular(10),
-          boxShadow: [
-            BoxShadow(
-              color: Color(0x40000000),
-              offset: Offset(0, 3),
-              blurRadius: 3,
-            ),
-          ],
-        ),
-        child: Center(
-          child: Text(
-            '$seatNumber',
-            style: TextStyle(
-              color: seatSelected[row][index] ? Colors.white : Colors.black,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget _buildSeatIconWithText(Color color, String text) {
-    return Expanded(
-      child: Column(
-        children: [
-          Container(
-            width: 50,
-            height: 50,
-            decoration: BoxDecoration(
-              color: color,
-              borderRadius: BorderRadius.circular(10),
-              boxShadow: [
-                BoxShadow(
-                  color: Color(0x40000000),
-                  offset: Offset(0, 3),
-                  blurRadius: 3,
-                ),
-              ],
-            ),
-          ),
-          SizedBox(height: 5),
-          Center(
-            child: Text(
-              text,
-              style: _getTextStyle(color),
-            ),
-          ),
-        ],
-      ),
+    return Row(
+      children: [
+        Container(
+          width: 20,
+          height: 20,
+          color: color,
+        ),
+        SizedBox(width: 5),
+        Text(
+          text,
+          style: TextStyle(fontSize: 14),
+        ),
+      ],
     );
   }
 
   Widget _buildSeatLayout() {
-    int seatNumber = 1;
     return Column(
-      children: List.generate(
-        16, // Generate 16 rows
-        (row) {
-          return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 10.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Row(
-                  children: List.generate(
-                    2, // 2 seats on the left side
-                    (index) {
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                        child: _buildSeatIcon(
-                            Colors.grey, row, index, seatNumber++),
-                      );
-                    },
+      children: [
+        for (int row = 0;
+            row < seatSelected.length;
+            row += 4) // Create blocks of 4 rows
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              for (int block = 0;
+                  block < 4;
+                  block++) // Create 4 blocks in a row
+                if (row + block < seatSelected.length)
+                  Expanded(
+                    child: Padding(
+                      padding: EdgeInsets.all(4),
+                      child: Column(
+                        children: [
+                          for (int index = 0;
+                              index < seatSelected[row + block].length;
+                              index++)
+                            GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  if (!seatUnavailable[row + block][index]) {
+                                    seatSelected[row + block][index] =
+                                        !seatSelected[row + block][index];
+                                  }
+                                });
+                              },
+                              child: Container(
+                                margin: EdgeInsets.all(4),
+                                width: 40,
+                                height: 40,
+                                decoration: BoxDecoration(
+                                  color: seatUnavailable[row + block][index]
+                                      ? Colors.black
+                                      : seatSelected[row + block][index]
+                                          ? Colors.red
+                                          : Colors.grey,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    '${(row + block) * 4 + index + 1}',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
                   ),
-                ),
-                SizedBox(
-                    width: 20), // Adjust space between left and right seats
-                Row(
-                  children: List.generate(
-                    2, // 2 seats on the right side
-                    (index) {
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                        child: _buildSeatIcon(
-                            Colors.grey, row, index + 2, seatNumber++),
-                      );
-                    },
-                  ),
-                ),
-              ],
-            ),
-          );
-        },
-      ),
+            ],
+          ),
+      ],
     );
   }
 
   TextStyle _getTextStyle(Color color) {
-    return GoogleFonts.inter(
-      color: color,
+    return GoogleFonts.roboto(
       fontSize: 16,
       fontWeight: FontWeight.bold,
+      color: color,
     );
   }
 }

@@ -7,10 +7,12 @@ import 'package:rail_ease/services/paymob/ticketdata/ticket_data.dart';
 class AddCard extends StatefulWidget {
   final int totalPrice;
   final Map<String, dynamic> trainData;
+  final List<int> selectedSeats; // Include selectedSeats in constructor
 
   AddCard({
     required this.totalPrice,
     required this.trainData,
+    required this.selectedSeats, // Pass selectedSeats in constructor
   });
 
   @override
@@ -32,6 +34,10 @@ class _AddCardState extends State<AddCard> {
     _expiryDateController.dispose();
     _cvcController.dispose();
     super.dispose();
+  }
+
+  List<int> getSelectedSeats() {
+    return widget.selectedSeats; // Return selectedSeats from widget
   }
 
   @override
@@ -188,6 +194,9 @@ class _AddCardState extends State<AddCard> {
       arrivalTimeToDestinationStation:
           widget.trainData['arrivalTimeToDestinationStation'] ?? '',
       date: widget.trainData['date'] ?? '',
+      numberOfStops:
+          int.tryParse(widget.trainData['numberOfStops'] ?? '0') ?? 0,
+      selectedSeats: getSelectedSeats(), // Method to get selected seats
     );
 
     await firestoreService.saveTicketToSubcollection(ticketData);
@@ -209,6 +218,15 @@ class _AddCardState extends State<AddCard> {
                       trainNumber: ticketData.trainNumber,
                       totalPrice: ticketData.ticketPrice,
                       date: ticketData.date,
+                      selectedSeats: [],
+                      arrivalTimeToDestinationStation: '',
+                      arrivalTimeToStation: '',
+                      trainType: '',
+                      tripDuration: '',
+                      numberOfStops: '',
+                      ticketPrice: '',
+                      currentStation: '',
+                      arrivalStation: '',
                     ),
                   ),
                 );

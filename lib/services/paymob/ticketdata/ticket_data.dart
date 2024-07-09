@@ -1,76 +1,90 @@
 class TicketData {
-  final String trainNumber;
-  final String currentStation;
   final String arrivalStation;
+  final String currentStation;
+  final int ticketPrice;
+  final int numberOfStops;
+  final String tripDuration;
   final String type;
-  final String date;
   final String arrivalTimeToStation;
   final String arrivalTimeToDestinationStation;
-  final int ticketPrice;
-  final String tripDuration;
+  final String trainNumber;
+  final String date;
+  final List<int> selectedSeats; // Add selectedSeats field
 
   TicketData({
-    required this.trainNumber,
-    required this.currentStation,
     required this.arrivalStation,
+    required this.currentStation,
+    required this.ticketPrice,
+    required this.numberOfStops,
+    required this.tripDuration,
     required this.type,
-    required this.date,
     required this.arrivalTimeToStation,
     required this.arrivalTimeToDestinationStation,
-    required this.ticketPrice,
-    required this.tripDuration,
+    required this.trainNumber,
+    required this.date,
+    required this.selectedSeats, // Initialize selectedSeats
   });
 
-  TicketData copyWith({
-    String? trainNumber,
-    String? currentStation,
-    String? arrivalStation,
-    String? type,
-    String? date,
-    String? arrivalTimeToStation,
-    String? arrivalTimeToDestinationStation,
-    int? ticketPrice,
-    String? tripDuration,
-  }) {
+  factory TicketData.fromFirestore(Map<String, dynamic> data) {
     return TicketData(
-      trainNumber: trainNumber ?? this.trainNumber,
-      currentStation: currentStation ?? this.currentStation,
-      arrivalStation: arrivalStation ?? this.arrivalStation,
-      type: type ?? this.type,
-      date: date ?? this.date,
-      arrivalTimeToStation: arrivalTimeToStation ?? this.arrivalTimeToStation,
-      arrivalTimeToDestinationStation: arrivalTimeToDestinationStation ??
-          this.arrivalTimeToDestinationStation,
-      ticketPrice: ticketPrice ?? this.ticketPrice,
-      tripDuration: tripDuration ?? this.tripDuration,
+      arrivalStation: data['arrivalStation'],
+      currentStation: data['currentStation'],
+      ticketPrice: data['ticketPrice'],
+      numberOfStops: data['numberOfStops'],
+      tripDuration: data['tripDuration'],
+      type: data['type'],
+      arrivalTimeToStation: data['arrivalTimeToStation'],
+      arrivalTimeToDestinationStation: data['arrivalTimeToDestinationStation'],
+      trainNumber: data['trainNumber'],
+      date: data['date'],
+      selectedSeats:
+          List<int>.from(data['selectedSeats']), // Convert to List<int>
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
-      'trainNumber': trainNumber,
-      'currentStation': currentStation,
       'arrivalStation': arrivalStation,
+      'currentStation': currentStation,
+      'ticketPrice': ticketPrice,
+      'numberOfStops': numberOfStops,
+      'tripDuration': tripDuration,
       'type': type,
-      'date': date,
       'arrivalTimeToStation': arrivalTimeToStation,
       'arrivalTimeToDestinationStation': arrivalTimeToDestinationStation,
-      'ticketPrice': ticketPrice,
-      'tripDuration': tripDuration,
+      'trainNumber': trainNumber,
+      'date': date,
+      'selectedSeats': selectedSeats, // Add selectedSeats to map
     };
   }
 
-  factory TicketData.fromFirestore(Map<String, dynamic> map) {
+  TicketData copyWith({
+    String? arrivalStation,
+    String? currentStation,
+    int? ticketPrice,
+    int? numberOfStops,
+    String? tripDuration,
+    String? type,
+    String? arrivalTimeToStation,
+    String? arrivalTimeToDestinationStation,
+    String? trainNumber,
+    String? date,
+    List<int>? selectedSeats, // Add selectedSeats parameter
+  }) {
     return TicketData(
-      trainNumber: map['trainNumber'],
-      currentStation: map['currentStation'],
-      arrivalStation: map['arrivalStation'],
-      type: map['type'],
-      date: map['date'],
-      arrivalTimeToStation: map['arrivalTimeToStation'],
-      arrivalTimeToDestinationStation: map['arrivalTimeToDestinationStation'],
-      ticketPrice: map['ticketPrice'],
-      tripDuration: map['tripDuration'],
+      arrivalStation: arrivalStation ?? this.arrivalStation,
+      currentStation: currentStation ?? this.currentStation,
+      ticketPrice: ticketPrice ?? this.ticketPrice,
+      numberOfStops: numberOfStops ?? this.numberOfStops,
+      tripDuration: tripDuration ?? this.tripDuration,
+      type: type ?? this.type,
+      arrivalTimeToStation: arrivalTimeToStation ?? this.arrivalTimeToStation,
+      arrivalTimeToDestinationStation: arrivalTimeToDestinationStation ??
+          this.arrivalTimeToDestinationStation,
+      trainNumber: trainNumber ?? this.trainNumber,
+      date: date ?? this.date,
+      selectedSeats:
+          selectedSeats ?? this.selectedSeats, // Add selectedSeats copy logic
     );
   }
 }

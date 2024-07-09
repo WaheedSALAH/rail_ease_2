@@ -8,11 +8,21 @@ class MyTicket extends StatelessWidget {
   final String trainNumber;
   final int totalPrice;
   final String date;
+  final List<int> selectedSeats;
 
   MyTicket({
     required this.trainNumber,
     required this.totalPrice,
     required this.date,
+    required this.selectedSeats,
+    required String arrivalTimeToDestinationStation,
+    required String arrivalTimeToStation,
+    required String trainType,
+    required String tripDuration,
+    required String numberOfStops,
+    required String ticketPrice,
+    required String currentStation,
+    required String arrivalStation,
   });
 
   @override
@@ -22,7 +32,7 @@ class MyTicket extends StatelessWidget {
         title: Text('Ticket Details'),
       ),
       body: FutureBuilder<TicketData?>(
-        future: FirestoreService().getTicketData(trainNumber),
+        future: FirestoreService().getTicketData(trainNumber, date),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
@@ -33,12 +43,6 @@ class MyTicket extends StatelessWidget {
           }
 
           TicketData ticket = snapshot.data!;
-
-          // Save the ticket to the subcollection
-          saveTicket(ticket.copyWith(
-            ticketPrice: totalPrice,
-            date: date,
-          ));
 
           return SingleChildScrollView(
             padding: EdgeInsets.all(20),
@@ -93,6 +97,11 @@ class MyTicket extends StatelessWidget {
                   'Train Type: ${ticket.type}',
                   style: TextStyle(fontSize: 16),
                 ),
+                SizedBox(height: 10),
+                Text(
+                  'Selected Seats: ${selectedSeats.join(', ')}',
+                  style: TextStyle(fontSize: 16),
+                ),
                 SizedBox(height: 20),
                 Container(
                   padding: EdgeInsets.all(10),
@@ -118,6 +127,7 @@ class MyTicket extends StatelessWidget {
                     await saveTicket(ticket.copyWith(
                       ticketPrice: totalPrice,
                       date: date,
+                      selectedSeats: selectedSeats,
                     ));
                     Navigator.pushReplacement(
                       context,
@@ -135,10 +145,20 @@ class MyTicket extends StatelessWidget {
   }
 
   String _generateQrData(TicketData ticket) {
-    return '${ticket.trainNumber} , ${ticket.currentStation} , ${ticket.arrivalStation} , $totalPrice EGP';
+    return 'Train Number: ${ticket.trainNumber}\n'
+        'Current Station: ${ticket.currentStation}\n'
+        'Arrival Station: ${ticket.arrivalStation}\n'
+        'Ticket Price: ${ticket.ticketPrice} EGP\n'
+        'Trip Duration: ${ticket.tripDuration}\n'
+        'Arrival Time to Station: ${ticket.arrivalTimeToStation}\n'
+        'Arrival Time to Destination Station: ${ticket.arrivalTimeToDestinationStation}\n'
+        'Train Type: ${ticket.type}\n'
+        'Date: ${ticket.date}\n'
+        'Selected Seats: ${ticket.selectedSeats.join(', ')}';
   }
 
   Future<void> saveTicket(TicketData ticket) async {
-    await FirestoreService().saveTicketToSubcollection(ticket);
+    final firestoreService = FirestoreService();
+    await firestoreService.saveTicketToUserDocument(ticket);
   }
 }

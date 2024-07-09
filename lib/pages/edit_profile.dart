@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -14,7 +16,7 @@ class EditProfile extends StatefulWidget {
 }
 
 class _EditProfileState extends State<EditProfile> {
-  TextEditingController _fullNameController = TextEditingController();
+  TextEditingController _userNameController = TextEditingController();
   TextEditingController _emailController = TextEditingController();
   bool _isEditing = false;
   File? _selectedImage;
@@ -22,13 +24,31 @@ class _EditProfileState extends State<EditProfile> {
   @override
   void initState() {
     super.initState();
-    _fullNameController.text = 'Zagazig University'; // Initial value
-    _emailController.text = 'FCI.zu.eg@com'; // Initial value for email
+    _loadUserData(); // Load user data on page initialization
+  }
+
+  Future<void> _loadUserData() async {
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        DocumentSnapshot userDoc = await FirebaseFirestore.instance
+            .collection('Users')
+            .doc(user.uid)
+            .get();
+
+        setState(() {
+          _userNameController.text = userDoc.get('User Name');
+          _emailController.text = userDoc.get('email');
+        });
+      }
+    } catch (e) {
+      print('Error loading user data: $e');
+    }
   }
 
   @override
   void dispose() {
-    _fullNameController.dispose();
+    _userNameController.dispose();
     _emailController.dispose();
     super.dispose();
   }
@@ -40,6 +60,31 @@ class _EditProfileState extends State<EditProfile> {
       setState(() {
         _selectedImage = File(pickedFile.path);
       });
+    }
+  }
+
+  Future<void> _updateUserProfile() async {
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        await FirebaseFirestore.instance
+            .collection('Users')
+            .doc(user.uid)
+            .update({
+          'username': _userNameController.text,
+          // 'email': _emailController.text, // Email should not be updated directly like this
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Profile updated successfully')),
+        );
+      }
+    } catch (e) {
+      print('Error updating profile: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content: Text('Failed to update profile. Please try again later.')),
+      );
     }
   }
 
@@ -140,7 +185,7 @@ class _EditProfileState extends State<EditProfile> {
                     alignment: Alignment.centerRight,
                     children: [
                       TextFormField(
-                        controller: _fullNameController,
+                        controller: _userNameController,
                         enabled: _isEditing,
                         decoration: InputDecoration(
                           labelText: 'Full Name',
@@ -167,11 +212,11 @@ class _EditProfileState extends State<EditProfile> {
                         ),
                       if (_isEditing)
                         GestureDetector(
-                          onTap: () {
+                          onTap: () async {
                             setState(() {
                               _isEditing = false;
                             });
-                            // Handle saving the edited full name
+                            await _updateUserProfile();
                           },
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
@@ -231,7 +276,9 @@ class _EditProfileState extends State<EditProfile> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.pop(context); // Cancel button functionality
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Color(0xFF0A0B0B),
                     shape: RoundedRectangleBorder(
@@ -249,7 +296,7 @@ class _EditProfileState extends State<EditProfile> {
                 ),
                 SizedBox(width: 20),
                 ElevatedButton(
-                  onPressed: () {},
+                  onPressed: _updateUserProfile,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Color(0xFFFF0000),
                     shape: RoundedRectangleBorder(

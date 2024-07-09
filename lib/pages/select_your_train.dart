@@ -7,7 +7,10 @@ class SelectYourTrain extends StatefulWidget {
   final String currentStation;
   final String arrivalStation;
 
-  SelectYourTrain({required this.currentStation, required this.arrivalStation});
+  SelectYourTrain(
+      {required this.currentStation,
+      required this.arrivalStation,
+      required DateTime selectedDate});
 
   @override
   _SelectYourTrainState createState() => _SelectYourTrainState();
@@ -205,10 +208,8 @@ class TrainDetailsPage extends StatelessWidget {
                       builder: (context) => SelectSeat(
                         arrivalStation: train['Arrival station'],
                         currentStation: train['Current station'],
-                        ticketPrice: train['Ticket price']
-                            .toString(), // Convert to string
-                        numberOfStops: train['Number of stops']
-                            .toString(), // Convert to string
+                        ticketPrice: train['Ticket price'].toString(),
+                        numberOfStops: train['Number of stops'].toString(),
                         tripDuration: train['Trip duration'],
                         trainType: train['Type'],
                         arrivalTimeToStation:
@@ -216,6 +217,8 @@ class TrainDetailsPage extends StatelessWidget {
                         arrivalTimeToDestinationStation:
                             train['Arrival time to the destination station'],
                         trainNumber: train['Train number'].toString(),
+
+                        // Update this to the selected date
                       ),
                     ),
                   );

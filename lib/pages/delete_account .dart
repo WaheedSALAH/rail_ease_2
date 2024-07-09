@@ -8,7 +8,8 @@ class DeleteAccount extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       body: Padding(
-        padding: const EdgeInsets.fromLTRB(15, 42, 10.9, 434),
+        padding: const EdgeInsets.fromLTRB(
+            15, 42, 10.9, 20), // Adjust bottom padding for better layout
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -67,7 +68,8 @@ class DeleteAccount extends StatelessWidget {
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.red,
-          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 15.4),
+          padding: const EdgeInsets.symmetric(
+              vertical: 12, horizontal: 35.4), // Added vertical padding value
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(14),
           ),

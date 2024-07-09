@@ -1,14 +1,18 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:rail_ease/services/paymob/ticketdata/ticket_data.dart';
 
 class FirestoreService {
   final CollectionReference trainsCollection =
       FirebaseFirestore.instance.collection('Trains');
 
-  Future<TicketData?> getTicketData(String trainNumber) async {
+  Future<TicketData?> getTicketData(String trainNumber, String date) async {
     try {
-      final querySnapshot =
-          await trainsCollection.doc(trainNumber).collection('tickets').get();
+      final querySnapshot = await trainsCollection
+          .doc(trainNumber)
+          .collection('tickets')
+          .where('date', isEqualTo: date)
+          .get();
 
       if (querySnapshot.docs.isNotEmpty) {
         final doc = querySnapshot.docs.first;
@@ -66,6 +70,40 @@ class FirestoreService {
     } catch (e) {
       print('Error getting stations: $e');
       return [];
+    }
+  }
+
+  // New method to save ticket data to user document
+  Future<void> saveTicketToUserDocument(TicketData ticket) async {
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+
+      if (user != null) {
+        DocumentReference userDocRef =
+            FirebaseFirestore.instance.collection('Users').doc(user.uid);
+
+        // Create a map of ticket data
+        Map<String, dynamic> ticketData = {
+          'trainNumber': ticket.trainNumber,
+          'currentStation': ticket.currentStation,
+          'arrivalStation': ticket.arrivalStation,
+          'ticketPrice': ticket.ticketPrice,
+          'tripDuration': ticket.tripDuration,
+          'arrivalTimeToStation': ticket.arrivalTimeToStation,
+          'arrivalTimeToDestinationStation':
+              ticket.arrivalTimeToDestinationStation,
+          'trainType': ticket.type,
+          'date': ticket.date,
+          'selectedSeats': ticket.selectedSeats,
+        };
+
+        // Update the user's document with the ticket data
+        await userDocRef.set({'ticket': ticketData}, SetOptions(merge: true));
+        print('Ticket saved to user document successfully!');
+      }
+    } catch (e) {
+      print('Error saving ticket to user document: $e');
+      throw e;
     }
   }
 }
